@@ -1,0 +1,37 @@
+.lmf_song_info {
+    text-align: center;
+}
+
+.lmf_lyrics {
+    border: 1px solid black;
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    width: 85%;
+    margin-left: auto;
+    /* of the box */
+    margin-right: auto;
+    margin-top: 50px;
+}
+
+.lmf_block {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    text-align: left;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+.lmf_multiblocks {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.lmf_return_link {
+    margin-top: 65px;
+    margin-bottom: 80px;
+    text-align: center;
+}

@@ -1,0 +1,60 @@
+.home_title {
+  text-align: center;
+  width: 350px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 3px solid black;
+  border-radius: 15px;
+  padding: 5px;
+}
+
+body {
+  background-color: #C5CBE3;
+}
+
+.introduction_message {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.selections {
+  /*puts songs on same row*/
+  display: flex;
+  /*wraps more songs around the page to the next row if too much*/
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-top: 60px;
+}
+
+.songs_with_pics {
+  display: block;
+  text-align: center;
+}
+
+.song_picture {
+  margin-top: 20px;
+  border-radius: 15px;
+  width: 200px;
+  border: 1px solid black;
+}
+
+.submit_form {
+  display: flex;
+  margin-top: 80px;
+  justify-content: center;
+}
+
+.song_idea {
+  text-align: center;
+  margin-left: 0.5px;
+  margin-right: 0.5px;
+  border-radius: 3px;
+  border: 1px solid black;
+}
+
+.btn {
+  margin-left: 0.5px;
+  margin-right: 0.5px;
+  border-radius: 3px;
+  border: 1px solid black;
+}

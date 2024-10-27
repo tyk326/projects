@@ -1,0 +1,36 @@
+.candy_song_info {
+    text-align: center;
+}
+
+.candy_lyrics {
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid black;
+    /* can also use percentages with width */
+    width: 60%;
+    padding: 20px;
+    border-radius: 20px;
+    margin-top: 50px;
+}
+
+.candy_block {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+
+}
+
+.candy_multiblocks {
+    display: flex;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.candy_return_link {
+    margin-top: 65px;
+    margin-bottom: 80px;
+    text-align: center;
+}
