@@ -29,25 +29,9 @@ public class App {
         main_uses_database(args);
     }
 
-    /**
-     * A simple webserver that connects to and uses a database.
-     * Uses default port; customizes the logger.
-     * 
-     * Reads arguments from the environment and then uses those arguments to connect
-     * to the database.
-     * Either DATABASE_URI should be set, or the values of POSTGRES_{IP, PORT, USER,
-     * PASS, DBNAME}.
-     * 
-     * Features yet to be implemented:
-     * Supports GET to /songs to retrieve all songs (without their body)
-     * Supports POST to /songs to create a new message
-     * Supports {GET, PUT, DELETE} to /songs/{id} to do associated action on message
-     * with given id
-     */
     public static void main_uses_database(String[] args) {
         /* holds connection to the database created from environment variables */
         Database db = Database.getDatabase();
-
         // our javalin app on which most operations must be performed
         Javalin app = Javalin
                 .create(
@@ -91,11 +75,7 @@ public class App {
         // NB: Gson is thread-safe. See
         // https://stackoverflow.com/questions/10380835/is-it-ok-to-use-gson-instance-as-a-static-field-in-a-model-bean-reuse
         final Gson gson = new Gson();
-
-        app.get("/helloworld", ctx -> {
-            ctx.status(200); // status 200 OK
-            ctx.result("Hello World from my tutorial app!");
-        });
+        
         /* ----- the server routing logic will go here ----- */
         app.get("/songs", ctx -> {
             ctx.status(200); // status 200 OK
@@ -139,7 +119,7 @@ public class App {
             SimpleRequest req = gson.fromJson(ctx.body(), SimpleRequest.class);
 
             // NB: add to MockDataStore; createEntry checks for null title and message
-            int newId = db.insertRow(req.mTitle(), req.mMessage());
+            int newId = db.insertRow(req.mMessage());
             if (newId == -1) {
                 resp = new StructuredResponse("error", "error performing insertion (title or message null?)", null);
             } else {
@@ -165,7 +145,7 @@ public class App {
 
             // NB: update entry in MockDataStore; updateOne checks for null title and
             // message and invalid ids
-            int result = db.updateOne(idx, req.mTitle(), req.mMessage());
+            int result = db.updateOne(idx, req.mMessage());
             if (result == -1) {
                 resp = new StructuredResponse("error", "unable to update row " + idx, null);
             } else {
@@ -198,7 +178,6 @@ public class App {
         // don't forget: nothing happens until we `start` the server
         // app.start( /*default is 8080*/ );
         app.start(getIntFromEnv("PORT", DEFAULT_PORT_WEBSERVER));
-        mainCliLoop(args, db);
         /*
          * if( db != null )
          * db.disconnect();
@@ -267,19 +246,5 @@ public class App {
             handler.header("Access-Control-Request-Method", methods);
             handler.header("Access-Control-Allow-Headers", headers);
         });
-    }
-
-    public static void mainCliLoop(String[] argv, Database db) {
-        // Get a fully-configured connection to the database, or exit immediately
-        if (db == null) {
-            System.err.println("Unable to make database object, exiting.");
-            return;
-            // System.exit(1);
-        }
-        db.dropTable();
-        db.createTable();
-        db.insertRow("test subject", "test message");
-        db.insertRow("test subject 2", "test message 2");
-        db.insertRow("broooo", "bruh");
     }
 }

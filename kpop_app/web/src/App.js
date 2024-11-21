@@ -5,9 +5,26 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useState } from 'react';
+import axios from 'axios';
 
-const handleClick = () => {
-  console.log('clicked!');
+//send data to database
+const handleClick = async(message) => {
+  try {
+    const response = await axios.post(
+      'http://localhost:8080/songs',
+      { mMessage: message},
+      { headers: { "Content-Type": 'application/json'}},
+    );
+    if (response.data.mStatus == "ok") {
+      console.error("Successfully sent data");
+    }
+    else {
+      console.error("Error for sending data");
+    }
+  }
+  catch(error) {
+    console.error("Error sending data to database: ", error);
+  }
 };
 
 function Home() { //handles main page content that is rendered when user navigates to "/" path
@@ -34,8 +51,8 @@ function Home() { //handles main page content that is rendered when user navigat
         </div>
       </div>
       <div className="submit_form">
-        <input type="text" placeholder="Give me a song to add!" className="song_idea" value={value} onChange={(e) => setValue(e.target.value)} />
-        <button className="btn" onClick={handleClick}>Submit</button>
+        <input type="text" placeholder="Song Name Suggestion!" className="song_idea" value={value} onChange={(e) => setValue(e.target.value)} />
+        <button className="btn" onClick={() => {handleClick(value); setValue("");}}>Submit</button>
       </div>
     </div>
   );

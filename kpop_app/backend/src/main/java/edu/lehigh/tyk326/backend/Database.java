@@ -25,7 +25,7 @@ public class Database {
      * abstract representation of a row of the database.  RowData and the 
      * Database are tightly coupled: if one changes, the other should too.
      */
-    public static record RowData (int mId, String mTitle, String mMessage) {}
+    public static record RowData (int mId, String mMessage) {}
 
     /**
      * The Database constructor is private: we only create Database objects 
@@ -44,8 +44,7 @@ public class Database {
     private static final String SQL_CREATE_TABLE = 
             "CREATE TABLE tblData (" + 
             " id SERIAL PRIMARY KEY," + 
-            " subject VARCHAR(50) NOT NULL," +
-            " message VARCHAR(500) NOT NULL)";
+            " message VARCHAR(50) NOT NULL)";
     // NB: we can easily get ourselves in trouble here by typing the
     //     SQL incorrectly.  We really should have things like "tblData"
     //     as constants, and then build the strings for the statements
@@ -123,8 +122,7 @@ public class Database {
     private PreparedStatement mInsertOne;
     /** the SQL for mInsertOne */
     private static final String SQL_INSERT_ONE_TBLDATA = 
-            "INSERT INTO tblData" + 
-            " VALUES (default, ?, ?);";
+            "INSERT INTO tblData (message) VALUES (?);";
 
     /** safely performs mInsertOne = mConnection.prepareStatement("INSERT INTO tblData VALUES (default, ?, ?)"); */
     private boolean init_mInsertOne(){
@@ -147,14 +145,13 @@ public class Database {
      * @param message The message body for this new row
      * @return The number of rows that were inserted
      */
-    int insertRow(String subject, String message) {
+    int insertRow(String message) {
         if( mInsertOne == null )  // not yet initialized, do lazy init
             init_mInsertOne();    // lazy init
         int count = 0;
         try {
-            System.out.println( "Database operation: insertRow(String, String)" );
-            mInsertOne.setString(1, subject);
-            mInsertOne.setString(2, message);
+            System.out.println( "Database operation: insertRow(String)" );
+            mInsertOne.setString(1, message);
             count += mInsertOne.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -201,53 +198,6 @@ public class Database {
             mUpdateOne.setString(1, message);
             mUpdateOne.setInt(2, id);
             res = mUpdateOne.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return res;
-    }
-
-    //////////////////////////  UPDATE ONE 2-ARG  //////////////////////////
-    /** ps to replace the message in tabledata for specified row with given value */
-    private PreparedStatement mUpdateOne_2arg;
-    /** the SQL for mUpdateOne */
-    private static final String SQL_UPDATE_ONE_TBLDATA_2ARG = 
-            "UPDATE tblData" + 
-            " SET subject = ?, message = ?" + 
-            " WHERE id = ?";
-
-    /** safely performs mUpdateOne = mConnection.prepareStatement("UPDATE tblData SET message = ? WHERE id = ?"); */
-    private boolean init_mUpdateOne_2arg(){
-        // return true on success, false otherwise
-        try {
-            mUpdateOne_2arg = mConnection.prepareStatement( SQL_UPDATE_ONE_TBLDATA_2ARG );
-        } catch (SQLException e) {
-            System.err.println("Error creating prepared statement: mUpdateOne");
-            System.err.println("Using SQL: " + SQL_UPDATE_ONE_TBLDATA_2ARG);
-            e.printStackTrace();
-            this.disconnect();  // @TODO is disconnecting on exception what we want?
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Update the subject and message for a row in the database
-     * @param id The id of the row to update
-     * @param subject The new message subject
-     * @param message The new message contents
-     * @return The number of rows that were updated.  -1 indicates an error.
-     */
-    int updateOne(int id, String subject, String message) {
-        if( mUpdateOne_2arg == null )  // not yet initialized, do lazy init
-            init_mUpdateOne_2arg();    // lazy init
-        int res = -1;
-        try {
-            System.out.println( "Database operation: updateOne(int id, String subject, String message)" );
-            mUpdateOne_2arg.setString(1, subject);
-            mUpdateOne_2arg.setString(2, message);
-            mUpdateOne_2arg.setInt(3, id);
-            res = mUpdateOne_2arg.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -301,7 +251,7 @@ public class Database {
     private PreparedStatement mSelectAll;
     /** the SQL for mSelectAll */
     private static final String SQL_SELECT_ALL_TBLDATA = 
-            "SELECT id, subject" + 
+            "SELECT id, message" + 
             " FROM tblData;";
 
     /** safely performs mSelectAll = mConnection.prepareStatement("SELECT id, subject FROM tblData"); */
@@ -332,8 +282,8 @@ public class Database {
             ResultSet rs = mSelectAll.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("id");
-                String subject = rs.getString("subject");
-                RowData data = new RowData(id, subject, null);
+                String message = rs.getString("message");
+                RowData data = new RowData(id, message);
                 res.add(data);
             }
             rs.close();  // remember to close the result set
@@ -383,9 +333,8 @@ public class Database {
             ResultSet rs = mSelectOne.executeQuery();
             if (rs.next()) {
                 int id = rs.getInt("id");
-                String subject = rs.getString("subject");
                 String message = rs.getString("message");
-                data = new RowData(id, subject, message);
+                data = new RowData(id, message);
             }
             rs.close();  // remember to close the result set
         } catch (SQLException e) {

@@ -7,4 +7,4 @@ package edu.lehigh.tyk326.backend;
  * @param mTitle   The title being provided by the client.
  * @param mMessage The message being provided by the client.
  */
-public record SimpleRequest(String mTitle,String mMessage){}
+public record SimpleRequest(String mMessage){}
