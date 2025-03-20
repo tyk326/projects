@@ -8,6 +8,7 @@
     display: flex;
     align-items: center;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 .title{
@@ -15,7 +16,7 @@
     height: auto;
     width: auto;
     position: absolute;
-    top: 40%;
+    top: 320px;
     display: flex;
     flex-direction: column;
     align-items: center;

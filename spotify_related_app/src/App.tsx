@@ -1,7 +1,7 @@
 import './App.css'
 import {BrowserRouter as Router, Routes, Route, useNavigate} from 'react-router-dom'
 import logo from './assets/name_logo.jpg'
-import { AllPlaylists } from './analytics/allPlaylists'
+import { AllPlaylists } from './analytics/AllPlaylists'
 import options_pic from './assets/playlist_options.avif'
 import { getToken } from './api/token'
 import { useEffect, useState } from 'react'
@@ -27,7 +27,7 @@ function HomePage(){
   return(
     <div className='intro_container'>
       <img src={logo} alt='Spotify Logo' style={{marginTop: '30px', borderRadius: '110px', width: '500px', height: '280px', boxShadow: '0px 0px 20px 4px white'}}/>
-      <img src={options_pic} alt='Playlist Options' style={{marginTop: '30px', borderRadius: '5px', width: '960px', height: '615px', boxShadow: '0px 0px 10px 0px white'}}/>
+      <img src={options_pic} alt='Playlist Options' style={{marginTop: '30px', borderRadius: '5px', width: '960px', height: '455px', boxShadow: '0px 0px 10px 0px white'}}/>
       <div className='MidIntroPage'>
         <div className='title'>
             <h1 style={{marginBottom: '45px', marginTop: '50px', fontSize: '100px', color: 'white', backgroundColor: 'rgba(0, 0, 0, 0.6)', borderRadius: '20px', boxShadow: '0px 0px 20px 4px black'}}>Spotilytics</h1>
