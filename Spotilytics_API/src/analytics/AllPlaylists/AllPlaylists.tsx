@@ -1,5 +1,5 @@
-import { getToken, token } from '../api/token'
-import { user_id } from '../../clientinfo'
+import { getToken, token } from '../../api/token'
+import { user_id } from '../../../clientinfo'
 import { useEffect, useState } from 'react';
 import './AllPlaylists.css'
 
@@ -40,11 +40,28 @@ export function AllPlaylists() {
         getPlaylists();
     }, []);
 
+
+    //had to move this code for scrolling with buttons inside component because it needs to render with it
+    const container = document.getElementById('scrollContainer');
+    const scrollAmt: number = 550;
+    const scrollLeft = () => {
+        if (container) {
+            container.scrollLeft -= scrollAmt;
+        }
+    }
+
+    const scrollRight = () => {
+        if (container) {
+            container.scrollLeft += scrollAmt;
+        }
+    }
+
+
     return (
         <>
             <div className='background_color'>
                 <h1 className='PlaylistTitle'>My Playlists:</h1>
-                <ul className='name_pic_grouping' style={{ listStyleType: 'none', padding: '0' }}>
+                <ul className='name_pic_grouping' id='scrollContainer'>
                     {listData?.map((item: Playlist) => (
                         <li key={item.id}>
                             <div className='name_pic_pair'>
@@ -54,11 +71,15 @@ export function AllPlaylists() {
                                         <p className='numberOfTracks'>There are {item.tracks.total} songs in this playlist!</p>
                                     </div>
                                 </div>
-                                <h4 style={{ color: 'white' }}>{item.name}</h4>
+                                <h4 style={{ color: 'white', marginBottom: '0px' }}>{item.name}</h4>
                             </div>
                         </li>
                     ))}
                 </ul>
+                <div className='moveBtns'>
+                    <button className='moveListBtn' onClick={scrollLeft}>⬅️</button>
+                    <button className='moveListBtn' onClick={scrollRight}>➡️</button>
+                </div>
             </div>
         </>
     )
