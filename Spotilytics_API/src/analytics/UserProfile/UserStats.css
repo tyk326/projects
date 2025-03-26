@@ -11,3 +11,61 @@
     display: flex;
     flex-direction: column;
 }
+
+.name{
+    color: white;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 40px;
+}
+
+.total_followers{
+    color: white;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.profilePic{
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 100px;
+    box-shadow: 0 1px 5px 0 white;
+}
+
+.LinkImgOptions{
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.KakaoImg{
+    width: 250px;
+    height: 200px;
+}
+
+.LinkOptions{
+    display: flex;
+    justify-content: center;
+    color: white;
+}
+
+.texts{
+    width: 250px;
+    background-color: rgb(84, 84, 84);
+    border-radius: 25px;
+    text-decoration: none;
+    margin-top: 5px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.texts:visited{
+    color: white;
+}
+
+.texts:hover{
+    text-decoration: underline;
+}

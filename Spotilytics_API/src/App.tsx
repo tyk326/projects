@@ -1,11 +1,13 @@
 import './App.css'
 import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
 import logo from './assets/name_logo.jpg'
-import { AllPlaylists } from './analytics/AllPlaylists/AllPlaylists'
 import options_pic from './assets/playlist_options.avif'
 import { getToken } from './api/token'
 import { useEffect, useState } from 'react'
 import { UserStats } from './analytics/UserProfile/UserStats'
+import { AllPlaylists } from './analytics/AllPlaylists/AllPlaylists'
+import { Recommendations } from './analytics/Recommendations/Recommendations'
+import { PlaySongs } from './analytics/PlaySongs/PlaySongs'
 
 function HomePage() {
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ function HomePage() {
   }, []); //this hook runs once
 
   const goToURL = () => {
-    navigate('/analytics');
+    navigate('/UserProfile');
   }
 
   return (
@@ -45,7 +47,10 @@ function App() {
     <Router>
       <Routes>
         <Route path='/' element={<HomePage />} />
-        <Route path='/analytics' element={<UserStats />} />
+        <Route path='/UserProfile' element={<UserStats />} />
+        <Route path='/PlaylistStats' element={<AllPlaylists />} />
+        <Route path='/Recommendations' element={<Recommendations />} />
+        <Route path='/PlaySongs' element={<PlaySongs />} />
       </Routes>
     </Router>
   )

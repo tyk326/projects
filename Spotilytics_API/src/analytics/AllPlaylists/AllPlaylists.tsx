@@ -2,6 +2,7 @@ import { getToken, token } from '../../api/token'
 import { user_id } from '../../../clientinfo'
 import { useEffect, useState } from 'react';
 import './AllPlaylists.css'
+import { Link } from 'react-router-dom';
 
 type Playlist = {
     id: string;
@@ -80,6 +81,7 @@ export function AllPlaylists() {
                     <button className='moveListBtn' onClick={scrollLeft}>⬅️</button>
                     <button className='moveListBtn' onClick={scrollRight}>➡️</button>
                 </div>
+                <Link to='../UserProfile'className='texts'>Go Back</Link>
             </div>
         </>
     )
