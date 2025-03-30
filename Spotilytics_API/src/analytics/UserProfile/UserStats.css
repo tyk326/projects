@@ -45,9 +45,13 @@
 }
 
 .LinkOptions{
+    margin-left: auto;
+    margin-right: auto;
     display: flex;
     justify-content: center;
+    width: 750px;
     color: white;
+    text-align: center;
 }
 
 .texts{
@@ -57,9 +61,6 @@
     text-decoration: none;
     margin-top: 5px;
     height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .texts:visited{

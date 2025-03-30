@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react'
 import { UserStats } from './analytics/UserProfile/UserStats'
 import { AllPlaylists } from './analytics/AllPlaylists/AllPlaylists'
 import { Recommendations } from './analytics/Recommendations/Recommendations'
-import { PlaySongs } from './analytics/PlaySongs/PlaySongs'
 
 function HomePage() {
   const navigate = useNavigate();
@@ -50,7 +49,6 @@ function App() {
         <Route path='/UserProfile' element={<UserStats />} />
         <Route path='/PlaylistStats' element={<AllPlaylists />} />
         <Route path='/Recommendations' element={<Recommendations />} />
-        <Route path='/PlaySongs' element={<PlaySongs />} />
       </Routes>
     </Router>
   )

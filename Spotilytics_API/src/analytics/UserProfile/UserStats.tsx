@@ -60,7 +60,7 @@ export function UserStats() {
                 <div className='LinkOptions'>
                     <Link to='/PlaylistStats' className='texts'>Click Here for Playlist Analytics</Link>
                     <Link to='/Recommendations' className='texts'>Click Here for Recommendations</Link>
-                    <Link to='/PlaySongs' className='texts'>Click Here to Play Music</Link>
+                    <Link to='../' className='texts'>Click Here to Go Back</Link>
                 </div>
             </div>
         </>
