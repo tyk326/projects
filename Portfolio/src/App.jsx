@@ -295,6 +295,17 @@ export default function Portfolio() {
     }
   };
 
+  const goToGithub = () => {
+    window.open("https://github.com/tyk326/projects", "_blank");
+  };
+  const goToLinkedin = () => {
+    window.open("https://www.linkedin.com/in/tylerkim04/", "_blank");
+  };
+  const gotToGmail = () => {
+    window.open("https://gmail.com", "_blank");
+  };
+  
+
   return (
     <div style={styles.container}>
       <style>{`
@@ -348,48 +359,51 @@ export default function Portfolio() {
           <h1 style={styles.heroTitle}>Tyler Kim</h1>
           <p style={styles.heroSubtitle}>Computer Science Student • Developer • Problem Solver</p>
           <div style={styles.socialLinks}>
-            <button 
-              style={styles.socialButton} 
+            <button
+              style={styles.socialButton}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(56, 189, 248, 0.2)';
                 e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
-              }} 
+              }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'rgba(56, 189, 248, 0.1)';
                 e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.2)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
+              onClick={() => goToGithub()}
             >
               <Github size={24} />
             </button>
-            <button 
-              style={styles.socialButton} 
+            <button
+              style={styles.socialButton}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(56, 189, 248, 0.2)';
                 e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
-              }} 
+              }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'rgba(56, 189, 248, 0.1)';
                 e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.2)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
+              onClick={() => goToLinkedin()}
             >
               <Linkedin size={24} />
             </button>
-            <button 
-              style={styles.socialButton} 
+            <button
+              style={styles.socialButton}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(56, 189, 248, 0.2)';
                 e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
                 e.currentTarget.style.transform = 'translateY(-2px)';
-              }} 
+              }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'rgba(56, 189, 248, 0.1)';
                 e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.2)';
                 e.currentTarget.style.transform = 'translateY(0)';
               }}
+              onClick={() => gotToGmail()}
             >
               <Mail size={24} />
             </button>
@@ -401,8 +415,8 @@ export default function Portfolio() {
       </section>
 
       {/* About Section */}
-      <section id="about" style={{...styles.section, padding: '5rem 1.5rem'}}>
-        <div style={{maxWidth: '896px', width: '100%'}}>
+      <section id="about" style={{ ...styles.section, padding: '5rem 1.5rem' }}>
+        <div style={{ maxWidth: '896px', width: '100%' }}>
           <h2 style={styles.sectionTitle}>
             <Code size={36} color="#38bdf8" />
             About Me
@@ -428,8 +442,8 @@ export default function Portfolio() {
             </div>
             <div style={styles.description}>
               <p>
-                I'm a senior at Lehigh University passionate about artificial intelligence, game development, and building interactive experiences. 
-                My work spans from implementing complex algorithms like A* pathfinding to creating engaging game mechanics and contributing to 
+                I'm a senior at Lehigh University passionate about artificial intelligence, game development, and building interactive experiences.
+                My work spans from implementing complex algorithms like A* pathfinding to creating engaging game mechanics and contributing to
                 real-world web applications.
               </p>
             </div>
@@ -438,21 +452,21 @@ export default function Portfolio() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" style={{minHeight: '100vh', padding: '5rem 1.5rem'}}>
-        <div style={{maxWidth: '1152px', margin: '0 auto'}}>
+      <section id="projects" style={{ minHeight: '100vh', padding: '5rem 1.5rem' }}>
+        <div style={{ maxWidth: '1152px', margin: '0 auto' }}>
           <h2 style={styles.sectionTitle}>
             <Zap size={36} color="#38bdf8" />
             Projects & Coursework
           </h2>
 
           {/* A* Pathfinding */}
-          <div 
-            style={styles.projectCard} 
+          <div
+            style={styles.projectCard}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
               e.currentTarget.style.transform = 'translateY(-4px)';
               e.currentTarget.style.boxShadow = '0 8px 20px rgba(56, 189, 248, 0.2)';
-            }} 
+            }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.15)';
               e.currentTarget.style.transform = 'translateY(0)';
@@ -461,9 +475,9 @@ export default function Portfolio() {
           >
             <h3 style={styles.projectTitle}>A* Pathfinding Algorithm</h3>
             <p style={styles.projectDescription}>
-              Implemented A* pathfinding for dynamic environments with moving obstacles. The system uses navigation meshes 
-              to guide an agent through a gate-filled world where walls randomly spawn and move. The algorithm handles 
-              real-time replanning when paths become blocked, ensuring the agent can collect resources efficiently while 
+              Implemented A* pathfinding for dynamic environments with moving obstacles. The system uses navigation meshes
+              to guide an agent through a gate-filled world where walls randomly spawn and move. The algorithm handles
+              real-time replanning when paths become blocked, ensuring the agent can collect resources efficiently while
               navigating around dynamic barriers.
             </p>
             <div style={styles.tags}>
@@ -480,13 +494,13 @@ export default function Portfolio() {
           </div>
 
           {/* Behavior Trees */}
-          <div 
-            style={styles.projectCard} 
+          <div
+            style={styles.projectCard}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
               e.currentTarget.style.transform = 'translateY(-4px)';
               e.currentTarget.style.boxShadow = '0 8px 20px rgba(56, 189, 248, 0.2)';
-            }} 
+            }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.15)';
               e.currentTarget.style.transform = 'translateY(0)';
@@ -495,9 +509,9 @@ export default function Portfolio() {
           >
             <h3 style={styles.projectTitle}>MOBA Hero AI - Behavior Trees</h3>
             <p style={styles.projectDescription}>
-              Designed and implemented AI decision-making for Hero agents in a MOBA-style game using behavior trees. 
-              The system balances strategic objectives like hunting enemies, leveling up by defeating minions, managing 
-              health through base retreats, and choosing between ranged attacks and area-effect abilities. Heroes gain 
+              Designed and implemented AI decision-making for Hero agents in a MOBA-style game using behavior trees.
+              The system balances strategic objectives like hunting enemies, leveling up by defeating minions, managing
+              health through base retreats, and choosing between ranged attacks and area-effect abilities. Heroes gain
               experience and power through combat, with the AI optimizing for damage output against enemy heroes.
             </p>
             <div style={styles.tags}>
@@ -514,13 +528,13 @@ export default function Portfolio() {
           </div>
 
           {/* Mario Game */}
-          <div 
-            style={styles.projectCard} 
+          <div
+            style={styles.projectCard}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
               e.currentTarget.style.transform = 'translateY(-4px)';
               e.currentTarget.style.boxShadow = '0 8px 20px rgba(56, 189, 248, 0.2)';
-            }} 
+            }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.15)';
               e.currentTarget.style.transform = 'translateY(0)';
@@ -529,8 +543,8 @@ export default function Portfolio() {
           >
             <h3 style={styles.projectTitle}>Mario-Style Platformer</h3>
             <p style={styles.projectDescription}>
-              Created a Mario-inspired platformer game with custom character animations, power-up systems, and enemy AI. 
-              Players navigate through levels, collect power-ups to gain abilities, and defeat pig enemies. The game features 
+              Created a Mario-inspired platformer game with custom character animations, power-up systems, and enemy AI.
+              Players navigate through levels, collect power-ups to gain abilities, and defeat pig enemies. The game features
               smooth character movement, collision detection, and classic platforming mechanics.
             </p>
             <div style={styles.tags}>
@@ -546,13 +560,13 @@ export default function Portfolio() {
           </div>
 
           {/* Zelda Game */}
-          <div 
-            style={styles.projectCard} 
+          <div
+            style={styles.projectCard}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.4)';
               e.currentTarget.style.transform = 'translateY(-4px)';
               e.currentTarget.style.boxShadow = '0 8px 20px rgba(56, 189, 248, 0.2)';
-            }} 
+            }}
             onMouseLeave={(e) => {
               e.currentTarget.style.borderColor = 'rgba(56, 189, 248, 0.15)';
               e.currentTarget.style.transform = 'translateY(0)';
@@ -561,8 +575,8 @@ export default function Portfolio() {
           >
             <h3 style={styles.projectTitle}>Zelda-Style Adventure Game</h3>
             <p style={styles.projectDescription}>
-              Developed a top-down adventure game inspired by classic 2D Zelda titles. Features a room-based navigation 
-              system where each room has unique designs, obstacles, and dangers. Players explore an interconnected world, 
+              Developed a top-down adventure game inspired by classic 2D Zelda titles. Features a room-based navigation
+              system where each room has unique designs, obstacles, and dangers. Players explore an interconnected world,
               solving puzzles and overcoming challenges as they progress through different areas.
             </p>
             <div style={styles.tags}>
@@ -580,8 +594,8 @@ export default function Portfolio() {
       </section>
 
       {/* Experience Section */}
-      <section id="experience" style={{minHeight: '100vh', padding: '5rem 1.5rem', background: 'rgba(10, 10, 10, 0.5)'}}>
-        <div style={{maxWidth: '1152px', margin: '0 auto'}}>
+      <section id="experience" style={{ minHeight: '100vh', padding: '5rem 1.5rem', background: 'rgba(10, 10, 10, 0.5)' }}>
+        <div style={{ maxWidth: '1152px', margin: '0 auto' }}>
           <h2 style={styles.sectionTitle}>
             <Briefcase size={36} color="#38bdf8" />
             Experience
@@ -595,7 +609,7 @@ export default function Portfolio() {
               </div>
               <span style={styles.experienceDate}>Jun 2025 – Aug 2025</span>
             </div>
-            
+
             <div style={styles.bulletList}>
               <p style={styles.bullet}>
                 <span style={styles.bulletPoint}>•</span>
@@ -624,13 +638,13 @@ export default function Portfolio() {
 
             <div style={styles.imageGrid}>
               <img
-                src="https://www.ministrygridstorage.com/MarketingAssets/20220401-MG-Web-Screenshot%201.png"
+                src="/Ministrygrid.jpeg"
                 alt="Ministry Grid Platform"
                 style={styles.image}
               />
               <img
-                src="https://www.ministrygridstorage.com/MarketingAssets/20220401-MG-Web-Screenshot%202.png"
-                alt="Ministry Grid Dashboard"
+                src="/Lifeway.png"
+                alt="Lifeway Logo"
                 style={styles.image}
               />
             </div>
@@ -639,28 +653,28 @@ export default function Portfolio() {
       </section>
 
       {/* Other Section */}
-      <section id="other" style={{minHeight: '100vh', padding: '5rem 1.5rem'}}>
-        <div style={{maxWidth: '1152px', margin: '0 auto'}}>
+      <section id="other" style={{ minHeight: '100vh', padding: '5rem 1.5rem' }}>
+        <div style={{ maxWidth: '1152px', margin: '0 auto' }}>
           <h2 style={styles.sectionTitle}>
             <Lightbulb size={36} color="#38bdf8" />
             Beyond Code
           </h2>
 
           {/* Music */}
-          <div style={{...styles.card, marginBottom: '3rem'}}>
-            <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+          <div style={{ ...styles.card, marginBottom: '3rem' }}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Music size={24} color="#38bdf8" />
               Classical Music
             </h3>
-            <p style={{color: '#cbd5e1', fontSize: '1.125rem'}}>
-              My favorite classical piano piece is <span style={{color: '#38bdf8', fontWeight: '600'}}>Songs Without Words Op. 67 No. 2</span> by Felix Mendelssohn. 
+            <p style={{ color: '#cbd5e1', fontSize: '1.125rem' }}>
+              My favorite classical piano piece is <span style={{ color: '#38bdf8', fontWeight: '600' }}>Songs Without Words Op. 67 No. 2</span> by Felix Mendelssohn.
               This beautiful Romantic-era piece showcases Mendelssohn's gift for creating lyrical, singing melodies on the piano.
             </p>
           </div>
 
           {/* Physics Labs */}
           <div style={styles.card}>
-            <h3 style={{fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <Zap size={24} color="#38bdf8" />
               Physics Experiments
             </h3>
@@ -672,7 +686,7 @@ export default function Portfolio() {
                   style={styles.physicsImage}
                 />
                 <h4 style={styles.physicsTitle}>Measuring the Mass of an Electron</h4>
-                <p style={{color: '#cbd5e1'}}>
+                <p style={{ color: '#cbd5e1' }}>
                   Laboratory experiment using a cathode ray tube with a blue coil to determine the mass-to-charge ratio of an electron.
                 </p>
               </div>
@@ -683,7 +697,7 @@ export default function Portfolio() {
                   style={styles.physicsImage}
                 />
                 <h4 style={styles.physicsTitle}>Equipotential Lines in Electric Fields</h4>
-                <p style={{color: '#cbd5e1'}}>
+                <p style={{ color: '#cbd5e1' }}>
                   Mapping equipotential lines to visualize electric field patterns and understand electrostatic principles.
                 </p>
               </div>
