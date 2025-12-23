@@ -11,17 +11,22 @@ import RestaurantImage from './assets/restaurant.jpeg'
 import EntertainmentImage from './assets/entertainment.jpeg'
 import TourismImage from './assets/tourism.jpeg'
 import LeisureImage from './assets/leisure.jpeg'
+import { CircleChevronUp } from 'lucide-react';
 
 
 // home page
 export function Overview() {
-    const { address, places, setAddress, setPlaces } = useContext(UserContext);
+    const { places, setPlaces } = useContext(UserContext);
     const [opened, { open, close }] = useDisclosure(false);
-    console.log(places);
+
+    const handleRemove = (index: number) => {
+        const modifiedPlaces = places.filter((_, i) => i !== index);
+        setPlaces(modifiedPlaces);
+    }
 
     return (
         <>
-            <div className='bg-[#ffd3d3]'>
+            <div className='bg-[#ffd3d3] min-h-screen overflow-y-hidden'>
                 <Title />
                 <Flex className='mt-20' gap="xl" wrap="wrap" justify="space-evenly" direction="row">
                     {places.map((place, index) => (
@@ -43,14 +48,20 @@ export function Overview() {
                             <p className='text-center text-2xl font-medium mt-2'>
                                 {place.properties.name}
                             </p>
-                            <Button variant="filled" color="rgba(255, 97, 97, 1)" radius='md' onClick={open} className='mt-38'>
-                                Learn more
+                            <p className='text-center text-md font-light'>
+                                {place.properties.city && place.properties.state ? `${place.properties.city}, ${place.properties.state}` : ''}
+                            </p>
+                            <Button variant="filled" color='red' radius='md' onClick={() => handleRemove(index)} w={200} className='mt-24'>
+                                Remove Place
+                            </Button>
+                            <Button variant="filled" color="rgba(255, 140, 160, 1)" radius='md' onClick={open} className='mt-4'>
+                                Learn More
                             </Button>
                         </Card>
                     ))}
                 </Flex>
                 <Modal opened={opened} onClose={close} title="Location Details">
-                    {/* Modal content */}
+                    {/* AI generated content */}
                 </Modal>
             </div>
         </>
