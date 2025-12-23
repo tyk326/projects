@@ -1,25 +1,36 @@
 import { createContext, Dispatch, SetStateAction, useState } from "react";
 
 export interface UserData {
-    title: string;
-    link: string;
-    setTitle: Dispatch<SetStateAction<string>>;
-    setLink: Dispatch<SetStateAction<string>>;
+    address: string;
+    places: PlaceFeature[];
+    setAddress: Dispatch<SetStateAction<string>>;
+    setPlaces: Dispatch<SetStateAction<PlaceFeature[]>>;
+}
+
+interface PlaceFeature {
+    properties: {
+        name: string;
+        country: string;
+        state: string;
+        city: string;
+        formatted: string;
+        categories: string[];
+    };
 }
 
 export const UserContext = createContext<UserData>({
-    title: '',
-    link: '',
-    setTitle: () => { },
-    setLink: () => { },
+    address: '',
+    places: [],
+    setAddress: () => { },
+    setPlaces: () => { },
 });
 
 export function ContextProvider({ children }: { children: React.ReactNode }) {
-    const [title, setTitle] = useState('');
-    const [link, setLink] = useState('');
+    const [address, setAddress] = useState('');
+    const [places, setPlaces] = useState<PlaceFeature[]>([]);
 
     return (
-        <UserContext.Provider value={{ title, link, setTitle, setLink }}>
+        <UserContext.Provider value={{ address, places, setAddress, setPlaces }}>
             {children}
         </UserContext.Provider>
     );

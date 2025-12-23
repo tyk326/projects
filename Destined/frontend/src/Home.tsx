@@ -8,20 +8,20 @@ import { useNavigate } from 'react-router-dom'
 
 // home page
 export function Home() {
-  const { title, link, setTitle, setLink } = useContext(UserContext)
+  const { address, setAddress, setPlaces } = useContext(UserContext)
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  // post request to backend. send title and link
+  // post request to backend
   const handleClick = () => {
     setLoading(true)
     axios.post("http://127.0.0.1:5000/", {
-      "title": title,
-      "link": link,
+      "address": address,
     })
       .then((response) => {
-        if (response.data.message === 'OK'){
-          navigate(`/sheet/`)
+        if (response.data.message === 'OK') {
+          setPlaces(response.data.places);
+          navigate(`/overview/`);
         }
       })
       .catch((e) => console.log(e))
@@ -31,44 +31,38 @@ export function Home() {
     <>
       <Title />
       <div className='mt-16 bg-[#ff9797] text-center py-45'>
-        <h1 className='text-5xl font-bold'>Convert Youtube Piano Music to Sheets Effortlessly</h1>
-        <p className='text-xl mt-5'>Upload, organize, and download piano sheets all in one place</p>
+        <h1 className='text-5xl font-bold'>Decide Your Plans Without Thinking Too Hard</h1>
+        <p className='text-xl mt-5'>Choose and Go</p>
       </div>
       <div className='flex justify-center'>
         <div className='flex flex-col bg-[#e9e7e7] z-25 -mt-12 py-16 px-24 rounded-3xl shadow-xl shadow-[#ffb7c5] w-175 border-3'>
-          <h2 className='text-2xl font-bold mb-5'>Upload Your Link</h2>
+          <h2 className='text-2xl font-bold mb-5'>Enter Your Location</h2>
           <input
-            placeholder='Link title'
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            placeholder='Type Address Here...'
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             className='border-2 border-gray-500 mb-2 text-md p-1.5 rounded-lg'
           />
-          <input
-            placeholder='Enter your URL (e.g., https://example.com)'
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            className='border-2 border-gray-500 text-md p-1.5 rounded-lg'
-          />
           <Button loading={loading} onClick={() => handleClick()} className='bg-[#ff6e6e] mt-2 text-md p-1.5'>
-            Upload Link
+            Submit Location
           </Button>
         </div>
       </div>
       <div className='bg-[#f3f0f0] text-center py-16 px-28'>
-        <h2 className='text-3xl font-semibold mb-7'>About PianoQuery</h2>
+        <h2 className='text-3xl font-semibold mb-7'>About Destined</h2>
         <p>
-          PianoQuery is your personal piano music sheet solution. We make it easy to convert recording links of your favorite piano songs into music sheets.
+          Destined is your personal location solution. We make it easy for you to decide where you want to go and have fun.
         </p>
         <p>
-          Whether you're practicing for music, sharing music sheets with friends, or brainstorming possible projects, PianoQuery keeps everything organized and accessible.
+          Whether you're planning a day trip with your friends or don't know where to go eat, Destined keeps everything organized and accessible.
         </p>
         <p>
-          Our mission is to provide a easy way to create piano music sheets from any recording.
+          Our mission is to provide a seamless way to pick a spot and go.
         </p>
       </div>
       <div className='bg-linear-to-r  from-[#f88a8a] to-[#f86060] text-center py-12'>
         <h3 className='text-xl text-white font-bold mb-2'>Ready to Get Started?</h3>
-        <p className='text-white'>&copy; 2025 PianoQuery. All rights reserved.</p>
+        <p className='text-white'>&copy; 2025 Destined. All rights reserved.</p>
       </div>
     </>
   )

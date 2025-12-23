@@ -2,6 +2,7 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { Home } from './Home'
 import { ContextProvider } from "./ContextProvider";
 import { Title } from "./Title";
+import { Overview } from "./Overview";
 
 function App() {
     return (
@@ -10,6 +11,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Title />} >
                         <Route index element={<Home />} />
+                        <Route path="overview/" element={<Overview />} />
                     </Route>
                 </Routes>
             </ContextProvider>
