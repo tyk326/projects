@@ -1,7 +1,7 @@
 import { Button } from '@mantine/core'
 import { useContext, useState } from 'react'
 import axios from 'axios'
-import { UserContext } from './ContextProvider'
+import { PlaceFeature, UserContext } from './ContextProvider'
 import { Title } from './Title'
 import { useNavigate } from 'react-router-dom'
 
@@ -20,7 +20,9 @@ export function Home() {
     })
       .then((response) => {
         if (response.data.message === 'OK') {
-          setPlaces(response.data.places);
+          // filter out the places with no names
+          const withNames: PlaceFeature[] = response.data.places.filter((place: PlaceFeature) => place.properties.name);
+          setPlaces(withNames);
           navigate(`/overview/`);
         }
       })
@@ -38,7 +40,7 @@ export function Home() {
         <div className='flex flex-col bg-[#e9e7e7] z-25 -mt-12 py-16 px-24 rounded-3xl shadow-xl shadow-[#ffb7c5] w-175 border-3'>
           <h2 className='text-2xl font-bold mb-5'>Enter Your Location</h2>
           <input
-            placeholder='Type Address Here...'
+            placeholder='Type Address Here...(as accurately as possible 😅)'
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             className='border-2 border-gray-500 mb-2 text-md p-1.5 rounded-lg'
@@ -60,7 +62,7 @@ export function Home() {
           Our mission is to provide a seamless way to pick a spot and go.
         </p>
       </div>
-      <div className='bg-linear-to-r  from-[#f88a8a] to-[#f86060] text-center py-12'>
+      <div className='bg-linear-to-r from-[#f88a8a] to-[#f86060] text-center py-12'>
         <h3 className='text-xl text-white font-bold mb-2'>Ready to Get Started?</h3>
         <p className='text-white'>&copy; 2025 Destined. All rights reserved.</p>
       </div>

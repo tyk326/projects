@@ -7,7 +7,7 @@ export interface UserData {
     setPlaces: Dispatch<SetStateAction<PlaceFeature[]>>;
 }
 
-interface PlaceFeature {
+export interface PlaceFeature {
     properties: {
         name: string;
         country: string;
