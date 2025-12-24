@@ -10,7 +10,8 @@ import requests
 # load_dotenv()
 
 app = Flask(__name__) #__name__ is like 'this'. Creates an instance
-CORS(app) #to serve frontend. https://medium.com/@mterrano1/cors-in-a-flask-api-38051388f8cc
+allowed_origins = ["http://192.168.12.54:5173", "http://localhost:5173"]
+CORS(app, resources={r"/*": {"origins": allowed_origins}}) #to serve frontend. https://medium.com/@mterrano1/cors-in-a-flask-api-38051388f8cc
 
 GEO_API_KEY = os.getenv("GEOAPIFY_API_KEY")
 # SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -45,7 +46,7 @@ def home():
     # We use a 2000 meter (2km) radius
     places_url = "https://api.geoapify.com/v2/places"
     params = {
-        "categories": "catering.cafe, catering.restaurant, entertainment,tourism.sights,leisure",
+        "categories": "catering.restaurant.korean",
         "filter": f"circle:{lon},{lat},32000",
         "bias": f"proximity:{lon},{lat}",
         "limit": 50,
@@ -60,10 +61,29 @@ def home():
         'places': places_resp['features']
     })
 
+@app.route('/details/<place_id>', methods=['GET'])
+def details(place_id):
+    print("Fetching details for place_id:", place_id)
+
+    url = f"https://api.geoapify.com/v2/place-details"
+    params = {
+        "id": place_id,
+        "features": "details",
+        "apiKey": GEO_API_KEY
+    }
+
+    details_resp = requests.get(url, params=params).json()
+
+    return jsonify({
+        'message': 'OK',
+        'details': details_resp['features'][0]
+    })
+
 
 if __name__ == "__main__":
     app.run(debug=True) 
 
 # debug=True
+# host='0.0.0.0' is to allow access from other devices on the network
 # Automatic reload: The server restarts when you change the code.
 # Debug mode: Shows detailed error pages in your browser with stack traces.

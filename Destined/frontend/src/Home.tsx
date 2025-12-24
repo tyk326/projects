@@ -40,7 +40,7 @@ export function Home() {
         <div className='flex flex-col bg-[#e9e7e7] z-25 -mt-12 py-16 px-24 rounded-3xl shadow-xl shadow-[#ffb7c5] w-175 border-3'>
           <h2 className='text-2xl font-bold mb-5'>Enter Your Location</h2>
           <input
-            placeholder='Type Address Here...(as accurately as possible 😅)'
+            placeholder='Type Address Here...(place, city, state, etc. 😅)'
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             className='border-2 border-gray-500 mb-2 text-md p-1.5 rounded-lg'

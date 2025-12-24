@@ -15,6 +15,7 @@ export interface PlaceFeature {
         city: string;
         formatted: string;
         categories: string[];
+        place_id: string;
     };
 }
 
