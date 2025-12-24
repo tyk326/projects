@@ -23,6 +23,7 @@ export function Home() {
           // filter out the places with no names
           const withNames: PlaceFeature[] = response.data.places.filter((place: PlaceFeature) => place.properties.name);
           setPlaces(withNames);
+          console.log("Successfully retrieved places for new address");
           navigate(`/overview/`);
         }
       })

@@ -1,4 +1,4 @@
-import { Button, Card, Flex, Image, Text, Modal, Anchor } from '@mantine/core'
+import { Button, Card, Flex, Image, Text, Modal, Anchor, TextInput, ActionIcon, Loader } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useContext, useState, useEffect } from 'react'
 import axios from 'axios'
@@ -8,8 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { PlaceFeature } from './ContextProvider'
 import CafeImage from './assets/cafe.jpeg'
 import RestaurantImage from './assets/restaurant.jpeg'
-import { CircleChevronUp } from 'lucide-react';
-
+import { Search, XCircle } from 'lucide-react';
 
 interface PlaceDetails {
     place_id: string;
@@ -20,12 +19,13 @@ interface PlaceDetails {
     website: string;
 }
 
-
 // home page
 export function Overview() {
-    const { places, setPlaces } = useContext(UserContext);
+    const { address, places, setAddress, setPlaces } = useContext(UserContext);
     const [opened, { open, close }] = useDisclosure(false);
     const [details, setDetails] = useState<Record<string, PlaceDetails>>({});
+    const [newAddress, setNewAddress] = useState("");
+    const [loading, setLoading] = useState(false); // to show the loading icon when a user searches a new address
 
     const handleRemove = (index: number) => {
         const modifiedPlaces = places.filter((_, i) => i !== index);
@@ -35,63 +35,113 @@ export function Overview() {
     useEffect(() => {
         places.map((places) => {
             axios.get(`http://127.0.0.1:5000/details/${places.properties.place_id}`)
-                .then((response) => {
-                    if (response.data.message === 'OK') {
-                        setDetails(prev => ({ ...prev, [response.data.details.properties.place_id]: response.data.details.properties }));
-                        console.log(response.data.details.properties);
-                    }
-                })
-                .catch((e) => console.log(e))
+            .then((response) => {
+                if (response.data.message === 'OK') {
+                    setDetails(prev => ({ ...prev, [response.data.details.properties.place_id]: response.data.details.properties }));
+                    console.log("Successfully retrieved place details");
+                }
+            })
+            .catch((e) => console.log(e))
         });
+        setLoading(false);
     }, [places]); // if places changes, then refetch the details for each place
+
+    const getPlaces = () => {
+        axios.post("http://127.0.0.1:5000/", {
+            "address": newAddress, // use the new address instead of address because when doing setAddress, it is async, so the changes may not be made yet
+        })
+            .then((response) => {
+                if (response.data.message === 'OK') {
+                    // filter out the places with no names
+                    const withNames: PlaceFeature[] = response.data.places.filter((place: PlaceFeature) => place.properties.name);
+                    setPlaces(withNames);
+                    console.log("Successfully retrieved places for new address");
+                }
+            })
+            .catch((e) => console.log(e))
+    }
+
+    const handleSearch = () => {
+        setAddress(newAddress);
+        setLoading(true);
+        getPlaces();
+    }
 
     return (
         <>
             <div className='bg-[#ffd3d3] pb-20 min-h-screen overflow-y-hidden'>
-                <Title />
-                <Flex className='mt-20' gap="xl" wrap="wrap" justify="space-evenly" direction="row">
-                    {places.map((place, index) => (
-                        <Card key={index} shadow='xl' radius='lg' h={550} w={600} className='mt-16 bg-[#fef1f1]!' >
-                            <Card.Section>
-                                {place.properties.categories.some((category) => category.includes('restaurant')) ?
-                                    <Image src={RestaurantImage} alt='Restaurant' h={250} /> :
-                                    place.properties.categories.some((category) => category.includes('cafe')) ?
-                                        <Image src={CafeImage} alt='Cafe' h={250} /> :
-                                        <Image src='/assets/react.svg' alt='No Image Provided' h={250} />
+                {!loading ?
+                    <>
+                        <Title />
+                        <Flex gap='xs' className='mt-36 w-fit ml-auto mr-auto'>
+                            <ActionIcon variant="filled" size="xl" radius="xl" onClick={() => handleSearch()} className='mt-auto mb-auto'>
+                                <Search />
+                            </ActionIcon>
+                            <TextInput
+                                variant="filled"
+                                size="md"
+                                radius="xl"
+                                placeholder="Enter new address..."
+                                value={newAddress}
+                                onChange={(e) => setNewAddress(e.currentTarget.value)}
+                                rightSection={
+                                    <ActionIcon
+                                        variant="transparent"
+                                        color="gray"
+                                        onClick={() => setNewAddress('')}
+                                    >
+                                        <XCircle size={23} />
+                                    </ActionIcon>
                                 }
-                            </Card.Section>
-                            <p className='text-center text-2xl font-medium mt-2'>
-                                {place.properties.name}
-                            </p>
-                            <p className='text-center text-md font-light mt-1'>
-                                {details[place.properties.place_id]?.address_line2}
-                            </p>
-                            <div className='pl-4 pr-4 mt-auto'>
-                                <Flex justify='space-between'>
-                                    <p className='text-md font-light'>Phone 📞: {details[place.properties.place_id]?.contact?.phone}</p>
-                                    <p className='text-md font-light'>Cuisine 🍜: {details[place.properties.place_id]?.catering?.cuisine}</p>
-                                </Flex>
-                                <p className='text-md font-light'>Hours 🕔: {details[place.properties.place_id]?.opening_hours ? details[place.properties.place_id]?.opening_hours : 'Unable to be retrieved'}</p>
-                                <p className='text-md font-light'>
-                                    Website 💻: <Anchor href={`${details[place.properties.place_id]?.website}`} target='_blank' underline='hover'>
-                                        {details[place.properties.place_id]?.website}
-                                    </Anchor>
-                                </p>
-                            </div>
-                            <div className='flex mt-auto justify-between p-4'>
-                                <Button variant="filled" color="rgba(255, 140, 160, 1)" radius='md' onClick={open} w={180}>
-                                    Learn More
-                                </Button>
-                                <Button variant="filled" color='red' radius='md' onClick={() => handleRemove(index)} w={180}>
-                                    Remove Place
-                                </Button>
-                            </div>
-                        </Card>
-                    ))}
-                </Flex>
-                <Modal opened={opened} onClose={close} title="Location Details">
-                    {/* AI generated content */}
-                </Modal>
+                            />
+                        </Flex>
+                        <Flex className='' gap="xl" wrap="wrap" justify="space-evenly" direction="row">
+                            {places.map((place, index) => (
+                                <Card key={index} shadow='xl' radius='lg' h={550} w={600} className='mt-16 bg-[#fef1f1]!' >
+                                    <Card.Section>
+                                        {place.properties.categories.some((category) => category.includes('restaurant')) ?
+                                            <Image src={RestaurantImage} alt='Restaurant' h={250} /> :
+                                            place.properties.categories.some((category) => category.includes('cafe')) ?
+                                                <Image src={CafeImage} alt='Cafe' h={250} /> :
+                                                <Image src='/assets/react.svg' alt='No Image Provided' h={250} />
+                                        }
+                                    </Card.Section>
+                                    <p className='text-center text-2xl font-medium mt-3'>
+                                        {place.properties.name}
+                                    </p>
+                                    <p className='text-center text-md font-light mt-1'>
+                                        {details[place.properties.place_id]?.address_line2}
+                                    </p>
+                                    <div className='pl-4 pr-4 mt-auto'>
+                                        <Flex justify='space-between'>
+                                            <p className='text-md font-light'>Phone 📞: {details[place.properties.place_id]?.contact?.phone ? details[place.properties.place_id]?.contact?.phone : 'N/A'}</p>
+                                            <p className='text-md font-light'>Cuisine 🍜: {details[place.properties.place_id]?.catering?.cuisine ? details[place.properties.place_id]?.catering?.cuisine : 'N/A'}</p>
+                                        </Flex>
+                                        <p className='text-md font-light mt-1'>Hours 🕔: {details[place.properties.place_id]?.opening_hours ? details[place.properties.place_id]?.opening_hours : 'N/A'}</p>
+                                        <p className='text-md font-light mt-1'>
+                                            Website 💻: {details[place.properties.place_id]?.website ? <Anchor href={`${details[place.properties.place_id]?.website}`} target='_blank' underline='hover'>
+                                                Click to visit
+                                            </Anchor> : 'N/A'}
+                                        </p>
+                                    </div>
+                                    <div className='flex mt-auto justify-between p-4'>
+                                        <Button variant="filled" color="rgba(255, 140, 160, 1)" radius='md' onClick={open} w={180}>
+                                            Learn More
+                                        </Button>
+                                        <Button variant="filled" color='red' radius='md' onClick={() => handleRemove(index)} w={180}>
+                                            Remove Place
+                                        </Button>
+                                    </div>
+                                </Card>
+                            ))}
+                        </Flex>
+                        <Modal opened={opened} onClose={close} title="Location Details">
+                            {/* AI generated content */}
+                        </Modal>
+                    </>
+                    : <Flex justify='center'>
+                        <Loader color="blue" size="lg" className='mt-36' />
+                    </Flex>}
             </div>
         </>
     )
