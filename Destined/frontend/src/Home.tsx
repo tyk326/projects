@@ -21,7 +21,7 @@ export function Home() {
       .then((response) => {
         if (response.data.message === 'OK') {
           // filter out the places with no names
-          const withNames: PlaceFeature[] = response.data.places.filter((place: PlaceFeature) => place.properties.name);
+          const withNames: PlaceFeature[] = response.data.places.filter((place: any) => place.properties.name).map((place: any) => place.properties);
           setPlaces(withNames);
           console.log("Successfully retrieved places for new address");
           navigate(`/overview/`);

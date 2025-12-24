@@ -8,15 +8,13 @@ export interface UserData {
 }
 
 export interface PlaceFeature {
-    properties: {
-        name: string;
-        country: string;
-        state: string;
-        city: string;
-        formatted: string;
-        categories: string[];
-        place_id: string;
-    };
+    name: string;
+    country: string;
+    state: string;
+    city: string;
+    formatted: string;
+    categories: string[];
+    place_id: string;
 }
 
 export const UserContext = createContext<UserData>({
