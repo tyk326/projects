@@ -3,6 +3,7 @@ import { Home } from './Home'
 import { ContextProvider } from "./ContextProvider";
 import { Title } from "./Title";
 import { Overview } from "./Overview";
+import { History } from "./History";
 
 function App() {
     return (
@@ -12,6 +13,7 @@ function App() {
                     <Route path="/" element={<Title />} >
                         <Route index element={<Home />} />
                         <Route path="overview/" element={<Overview />} />
+                        <Route path="past-searches" element={<History />} />
                     </Route>
                 </Routes>
             </ContextProvider>
