@@ -16,9 +16,11 @@ allowed_origins = ["http://192.168.12.54:5173", "http://localhost:5173"]
 CORS(app, resources={r"/*": {"origins": allowed_origins}}) #to serve frontend. https://medium.com/@mterrano1/cors-in-a-flask-api-38051388f8cc
 
 GEO_API_KEY = os.getenv("GEOAPIFY_API_KEY")
-# SUPABASE_URL = os.getenv("SUPABASE_URL")
-# SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-# supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 client = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -113,6 +115,24 @@ def chatSummary():
     
     except Exception as e:
         return jsonify({"message": "ERROR", "response": "An unexpected error occurred"})
+
+@app.route('/save-search', methods=['POST'])
+def saveSearch():
+    data = request.json.get('searchData')
+
+    response = supabase.table("Searches").insert({
+        "id": data["id"],
+        "address": data["address"],
+        "places": data["places"],
+        "details": data["details"],
+    }).execute()
+
+    return jsonify({ "message": "OK", "data": response.data })
+
+@app.route('/get-searches', methods=['GET'])
+def getSearches():
+    response = supabase.table("Searches").select("*").order("created_at", desc=True).execute()
+    return jsonify({"message": "OK", "data": response.data})
 
 if __name__ == "__main__":
     app.run(debug=True) 

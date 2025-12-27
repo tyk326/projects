@@ -45,6 +45,9 @@ export function Home() {
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             className='border-2 border-gray-500 mb-2 text-md p-1.5 rounded-lg'
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') handleClick()
+            }}
           />
           <Button loading={loading} onClick={() => handleClick()} className='bg-[#ff6e6e] mt-2 text-md p-1.5'>
             Submit Location

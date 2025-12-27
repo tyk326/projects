@@ -35,7 +35,7 @@ export function ChatSummary({summary}: SummaryProp){
      return(
         <>
             <NavLink label={<Text fw={500}>Star Rating & Summary</Text>} onClick={() => retrieveSummary()} active variant='light' color="pink" className="rounded-2xl">
-                <Flex gap={10} align='center' className="mt-1">
+                <Flex gap={10} align='center' className="mt-2">
                     <p>Rating:</p>
                     <Rating value={chatResponse.rate} fractions={10} readOnly/>
                 </Flex>

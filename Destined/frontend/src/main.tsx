@@ -8,8 +8,10 @@ import '@mantine/notifications/styles.css'; // import this after core styles
 import { Notifications } from '@mantine/notifications';
 
 createRoot(document.getElementById('root')!).render(
+  <StrictMode>
     <MantineProvider>
       <Notifications />
       <App />
     </MantineProvider>
+  </StrictMode>
 )

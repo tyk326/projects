@@ -24,7 +24,7 @@ export function Title() {
                         w={162}
                         active
                         variant="filled"
-                        color="rgb(248, 80, 96, 1)"
+                        color="rgb(248, 60, 96, 1)"
                         className="rounded-3xl font-bold"
                     />
                 </Flex>

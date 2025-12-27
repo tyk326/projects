@@ -8,11 +8,12 @@ import { useNavigate } from 'react-router-dom'
 import { PlaceFeature } from './ContextProvider'
 import CafeImage from './assets/cafe.jpeg'
 import RestaurantImage from './assets/restaurant.jpeg'
-import { Search, XCircle } from 'lucide-react';
+import { Search, XCircle, BookMarked } from 'lucide-react';
 import { notifications } from '@mantine/notifications';
 import { ChatSummary } from './ChatSummary'
+import { nanoid } from 'nanoid'
 
-interface PlaceDetails {
+export interface PlaceDetails {
     place_id: string;
     address_line2: string;
     catering: { cuisine: string };
@@ -79,6 +80,26 @@ export function Overview() {
         getPlaces();
     }
 
+    // when the clicks to save the search of all places
+    const handleAddPastSearch = () => {
+        const id: string = nanoid(10);
+        const searchData = {
+            id: id,
+            address: address,
+            places: places,
+            details: details,
+        }
+        axios.post('http://127.0.0.1:5000/save-search', {
+            "searchData": searchData,
+        })
+            .then((response) => {
+                if (response.data.message === 'OK') {
+                    console.log("Successfully saved search data");
+                }
+            })
+            .catch((e) => console.log(e))
+    }
+
     return (
         <>
             <div className='bg-[#ffd3d3] pb-20 min-h-screen overflow-y-hidden'>
@@ -92,6 +113,7 @@ export function Overview() {
                             <TextInput
                                 variant="filled"
                                 size="md"
+                                w={350}
                                 radius="xl"
                                 placeholder="Enter new address..."
                                 value={newAddress}
@@ -109,6 +131,12 @@ export function Overview() {
                                     </ActionIcon>
                                 }
                             />
+                            <ActionIcon variant='filled' size={42} w={210} radius='xl' color='indigo' onClick={() => handleAddPastSearch()}>
+                                <Flex gap={6} align='center'>
+                                    <p className='font-medium'>Add to past searches</p>
+                                    <BookMarked />
+                                </Flex>
+                            </ActionIcon>
                         </Flex>
                         <Flex className='' gap="xl" wrap="wrap" justify="space-evenly" direction="row">
                             {places.map((place, index) => (
