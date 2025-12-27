@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { UserContext } from "./ContextProvider";
 import { useContext } from "react";
 import { Flex, NavLink } from "@mantine/core";
-import { History } from "lucide-react";
+import { History, MapPinPlus } from "lucide-react";
 
 export function Title() {
     const { address } = useContext(UserContext);
@@ -17,16 +17,28 @@ export function Title() {
                         </a>
                         {!!address.length && <p className="text-white text-xl">Current Address: {address}</p>}
                     </div>
-                    <NavLink
-                        href='/past-searches'
-                        label='Past Searches'
-                        leftSection={<History />}
-                        w={162}
-                        active
-                        variant="filled"
-                        color="rgb(248, 60, 96, 1)"
-                        className="rounded-3xl font-bold"
-                    />
+                    <Flex gap='md'>
+                        <NavLink
+                            href='/'
+                            label='New Search'
+                            leftSection={<MapPinPlus />}
+                            w='fit-content'
+                            active
+                            variant="filled"
+                            color="rgb(248, 60, 96, 1)"
+                            className="rounded-3xl font-bold"
+                        />
+                        <NavLink
+                            href='/past-searches'
+                            label='Past Searches'
+                            leftSection={<History />}
+                            w='fit-content'
+                            active
+                            variant="filled"
+                            color="rgb(248, 60, 96, 1)"
+                            className="rounded-3xl font-bold"
+                        />
+                    </Flex>
                 </Flex>
             </div>
             <Outlet />

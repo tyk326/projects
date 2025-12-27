@@ -43,7 +43,8 @@ export function History() {
             .then((response) => {
                 if (response.data.message === "OK") {
                     console.log("Successfully removed search from database.");
-                    setSearches(response.data.data);
+                    setSearches(response.data.data)
+                    setActiveTab(response.data.data[0].id);
                 }
             })
             .catch((e) => console.log(e));

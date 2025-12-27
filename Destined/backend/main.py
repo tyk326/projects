@@ -134,6 +134,13 @@ def getSearches():
     response = supabase.table("Searches").select("*").order("created_at").execute()
     return jsonify({"message": "OK", "data": response.data})
 
+@app.route('/remove-search', methods=['POST'])
+def removeSearch():
+    data = request.json.get('id')
+    supabase.table("Searches").delete().eq("id", data).execute()
+    updatedResponse = supabase.table("Searches").select("*").order("created_at").execute()
+    return jsonify({"message": "OK", "data": updatedResponse.data}) # return updated list after deletion
+
 if __name__ == "__main__":
     app.run(debug=True) 
 
