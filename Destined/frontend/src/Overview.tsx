@@ -29,7 +29,8 @@ export function Overview() {
     const [details, setDetails] = useState<Record<string, PlaceDetails>>({});
     const [newAddress, setNewAddress] = useState("");
     const [loading, setLoading] = useState(false); // to show the loading icon when a user searches a new address
-    const [summary, setSummary] = useState<{name: string, address: string}>({name: "", address: ""}); // for passing the name to the chat summary component
+    const [summary, setSummary] = useState<{ name: string, address: string }>({ name: "", address: "" }); // for passing the name to the chat summary component
+    const [clickedAddSearch, setClickedAddSearch] = useState(false); // to prevent multiple clicks on the same search
 
     const handleRemove = (index: number) => {
         const modifiedPlaces = places.filter((_, i) => i !== index);
@@ -119,7 +120,10 @@ export function Overview() {
                                 value={newAddress}
                                 onChange={(e) => setNewAddress(e.currentTarget.value)}
                                 onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSearch()
+                                    if (e.key === 'Enter') {
+                                        handleSearch();
+                                        setClickedAddSearch(false); // reset the clicked state when a new search is made
+                                    }
                                 }}
                                 rightSection={
                                     <ActionIcon
@@ -131,14 +135,14 @@ export function Overview() {
                                     </ActionIcon>
                                 }
                             />
-                            <ActionIcon variant='filled' size={42} w={210} radius='xl' color='indigo' onClick={() => handleAddPastSearch()}>
+                            <ActionIcon variant='filled' size={42} w={210} radius='xl' color='indigo' disabled={clickedAddSearch} onClick={() => { handleAddPastSearch(); if (!clickedAddSearch) setClickedAddSearch(true); }}>
                                 <Flex gap={6} align='center'>
                                     <p className='font-medium'>Add to past searches</p>
                                     <BookMarked />
                                 </Flex>
                             </ActionIcon>
                         </Flex>
-                        <Flex className='' gap="xl" wrap="wrap" justify="space-evenly" direction="row">
+                        <Flex gap="xl" wrap="wrap" justify="space-evenly" direction="row">
                             {places.map((place, index) => (
                                 <Card key={index} shadow='xl' radius='lg' h={550} w={600} className='mt-16 bg-[#fef1f1]!' >
                                     <Card.Section>
@@ -168,7 +172,7 @@ export function Overview() {
                                         </p>
                                     </div>
                                     <div className='flex mt-auto justify-between p-4'>
-                                        <Button variant="filled" color="rgba(255, 140, 160, 1)" radius='md' onClick={() => {open(); setSummary({name: place.name, address: details[place.place_id]?.address_line2});} } w={180}>
+                                        <Button variant="filled" color="rgba(255, 140, 160, 1)" radius='md' onClick={() => { open(); setSummary({ name: place.name, address: details[place.place_id]?.address_line2 }); }} w={180}>
                                             Learn More
                                         </Button>
                                         <Button variant="filled" color='red' radius='md' onClick={() => handleRemove(index)} w={180}>
@@ -179,7 +183,7 @@ export function Overview() {
                             ))}
                         </Flex>
                         <Modal opened={opened} onClose={close} title={<Text size='xl' fw={500} td='underline'>Details</Text>} size='xl' radius={10}>
-                            <ChatSummary summary={summary}/>
+                            <ChatSummary summary={summary} />
                         </Modal>
                     </>
                     : <Flex justify='center'>

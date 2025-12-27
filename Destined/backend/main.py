@@ -131,7 +131,7 @@ def saveSearch():
 
 @app.route('/get-searches', methods=['GET'])
 def getSearches():
-    response = supabase.table("Searches").select("*").order("created_at", desc=True).execute()
+    response = supabase.table("Searches").select("*").order("created_at").execute()
     return jsonify({"message": "OK", "data": response.data})
 
 if __name__ == "__main__":
