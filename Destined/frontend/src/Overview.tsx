@@ -1,4 +1,4 @@
-import { Button, Card, Flex, Image, Modal, Anchor, TextInput, ActionIcon, Loader } from '@mantine/core'
+import { Button, Card, Flex, Image, Modal, Anchor, TextInput, ActionIcon, Loader, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { useContext, useState, useEffect } from 'react'
 import axios from 'axios'
@@ -10,6 +10,7 @@ import CafeImage from './assets/cafe.jpeg'
 import RestaurantImage from './assets/restaurant.jpeg'
 import { Search, XCircle } from 'lucide-react';
 import { notifications } from '@mantine/notifications';
+import { ChatSummary } from './ChatSummary'
 
 interface PlaceDetails {
     place_id: string;
@@ -27,6 +28,7 @@ export function Overview() {
     const [details, setDetails] = useState<Record<string, PlaceDetails>>({});
     const [newAddress, setNewAddress] = useState("");
     const [loading, setLoading] = useState(false); // to show the loading icon when a user searches a new address
+    const [summary, setSummary] = useState<{name: string, address: string}>({name: "", address: ""}); // for passing the name to the chat summary component
 
     const handleRemove = (index: number) => {
         const modifiedPlaces = places.filter((_, i) => i !== index);
@@ -138,7 +140,7 @@ export function Overview() {
                                         </p>
                                     </div>
                                     <div className='flex mt-auto justify-between p-4'>
-                                        <Button variant="filled" color="rgba(255, 140, 160, 1)" radius='md' onClick={open} w={180}>
+                                        <Button variant="filled" color="rgba(255, 140, 160, 1)" radius='md' onClick={() => {open(); setSummary({name: place.name, address: details[place.place_id]?.address_line2});} } w={180}>
                                             Learn More
                                         </Button>
                                         <Button variant="filled" color='red' radius='md' onClick={() => handleRemove(index)} w={180}>
@@ -148,8 +150,8 @@ export function Overview() {
                                 </Card>
                             ))}
                         </Flex>
-                        <Modal opened={opened} onClose={close} title="Details">
-                            {/* AI generated content */}
+                        <Modal opened={opened} onClose={close} title={<Text size='xl' fw={500} td='underline'>Details</Text>} size='xl' radius={10}>
+                            <ChatSummary summary={summary}/>
                         </Modal>
                     </>
                     : <Flex justify='center'>

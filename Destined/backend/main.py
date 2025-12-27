@@ -5,9 +5,11 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import os
 import requests
+from google import genai
+from google.genai import types, errors
 
 # Load environment variables from .env
-# load_dotenv()
+load_dotenv()
 
 app = Flask(__name__) #__name__ is like 'this'. Creates an instance
 allowed_origins = ["http://192.168.12.54:5173", "http://localhost:5173"]
@@ -17,6 +19,8 @@ GEO_API_KEY = os.getenv("GEOAPIFY_API_KEY")
 # SUPABASE_URL = os.getenv("SUPABASE_URL")
 # SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 # supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 # return lat lon from given address using geoapify api
 def get_coords(address):
@@ -79,6 +83,36 @@ def details(place_id):
         'details': details_resp['features'][0]
     })
 
+@app.route('/chat-summary', methods=['POST'])
+def chatSummary():
+    user_input = request.json.get("prompt")
+    print(user_input)
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.0-flash",
+            config=types.GenerateContentConfig(
+                system_instruction="You are a restaurant expert that knows everything about Korean dining and customers' experiences."
+            ),
+            contents=user_input
+        )
+
+        print(response.text)
+
+        return jsonify({
+            'message': 'OK',
+            'response': response.text
+        })
+    except errors.ClientError as e:
+        if "429" in str(e):
+            return jsonify({
+                "message": "RATE_LIMT",
+                "response": "The AI is currently at capacity. Please wait a minute."
+            })
+        return jsonify({"message": "ERROR", "response": str(e)})
+    
+    except Exception as e:
+        return jsonify({"message": "ERROR", "response": "An unexpected error occurred"})
 
 if __name__ == "__main__":
     app.run(debug=True) 
