@@ -179,7 +179,7 @@ export function Overview() {
                             ))}
                         </Flex>
                         <Modal opened={opened} onClose={close} title={<Text size='xl' fw={500} td='underline'>Details</Text>} size='xl' radius={10}>
-                            <ChatSummary summary={summary}/>
+                            <ChatSummary summary={summary} />
                         </Modal>
                     </>
                     : <Flex justify='center'>
