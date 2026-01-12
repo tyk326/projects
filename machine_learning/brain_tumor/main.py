@@ -12,21 +12,21 @@ def getModel():
         nn.Conv2d(3, 32, 3, 1, 1), # first layer. (input channels (r,g,b), output channels (features), kernel size (window that slides over the image), stride (moves 1 pixel at a time), padding (1-pixel border so output size stays the same as the input size))
         nn.ReLU(),
         nn.MaxPool2d(2), # (kernel size and stride). Cuts the height and width of the image in half. The image started as 128x128
-        nn.Conv2d(32, 64, 3, 1, 1), # first layer
+        nn.Conv2d(32, 64, 3, 1, 1), # second layer
         nn.ReLU(),
         nn.MaxPool2d(2),
-        nn.Conv2d(64, 128, 3, 1, 1), # first layer
+        nn.Conv2d(64, 128, 3, 1, 1), # third layer
         nn.ReLU(),
         nn.MaxPool2d(2),
-        nn.Conv2d(128, 256, 3, 1, 1), # first layer
+        nn.Conv2d(128, 256, 3, 1, 1), # fourth layer
         nn.ReLU(),
         nn.MaxPool2d(2),
         nn.Flatten(), # flatten the layer. Takes 3d into 1d
-        nn.Linear(256 * 8 * 8, 1024), # output 512 neurons. Expecting 65,536 features. (total number of input features(last conv layer's channels * remaining image resolution))
+        nn.Linear(256 * 8 * 8, 1024), # output 1024 neurons. Expecting 65,536 features. (total number of input features(last conv layer's channels * remaining image resolution))
         nn.ReLU(),
         nn.Linear(1024, 512), # output 512 neurons. Expecting 65,536 features. (total number of input features(last conv layer's channels * remaining image resolution))
         nn.ReLU(),
-        nn.Dropout(0.3), # randomly turns off 50% of neurons during training to prevent the model from "memorizing" the data (overfitting)
+        nn.Dropout(0.3), # randomly turns off 30% of neurons during training to prevent the model from "memorizing" the data (overfitting)
         nn.Linear(512, 4) # 4 because we have 4 classes
     )
 
