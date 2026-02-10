@@ -1,0 +1,22 @@
+// AUTH CALLBACK ROUTE: Handles OAuth redirect from Google
+// Location: src/app/auth/callback/route.ts
+
+import { createServerSupabaseClient } from '@/lib/supabase-server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export async function GET(request: NextRequest) {
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get('code');
+  const origin = requestUrl.origin;
+
+  if (code) {
+    const supabase = await createServerSupabaseClient();
+    
+    // Exchange the code for a session
+    await supabase.auth.exchangeCodeForSession(code);
+  }
+
+  // Redirect to homepage
+  return NextResponse.redirect(`${origin}/`);
+}

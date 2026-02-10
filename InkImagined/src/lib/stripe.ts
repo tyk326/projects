@@ -13,21 +13,21 @@ export const CANVAS_PRODUCTS = [
     id: 'canvas-9x12', // printful cost is $16.32
     name: '9" × 12" Canvas',
     size: '9x12',
-    price: 3499, // $34.99 in cents
+    price: 3899, // $38.99 in cents
     printful_variant_id: 4438, // Replace with actual Printful variant ID
   },
   {
     id: 'canvas-12x16', // printful cost is $23.41
     name: '12" × 16" Canvas',
     size: '12x16',
-    price: 4499, // $44.99 in cents
+    price: 5099, // $50.99 in cents
     printful_variant_id: 4440, // Replace with actual Printful variant ID
   },
   {
     id: 'canvas-16x20', // printful cost is $28.56
     name: '16" × 20" Canvas',
     size: '16x20',
-    price: 5699, // $56.99 in cents
+    price: 6799, // $67.99 in cents
     printful_variant_id: 4442, // Replace with actual Printful variant ID
   },
 ];

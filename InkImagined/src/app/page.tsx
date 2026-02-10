@@ -1,6 +1,7 @@
 'use client';
 
 // FRONTEND PAGE: Home / Main Upload & Generation Page
+// FIXED: Handles OAuth redirect and shows upload immediately
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -14,6 +15,7 @@ import type { ThemeStyle } from '@/types';
 
 export default function HomePage() {
   const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true); // Add loading state
   const [uploadedUrl, setUploadedUrl] = useState('');
   const [selectedTheme, setSelectedTheme] = useState<ThemeStyle | null>(null);
   const [generatedImage, setGeneratedImage] = useState<any>(null);
@@ -24,15 +26,38 @@ export default function HomePage() {
   useEffect(() => {
     const supabase = createClient();
     
-    // Check auth status
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
+    // Check auth status on mount
+    const checkUser = async () => {
+      try {
+        // Force refresh the session (important after OAuth redirect!)
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+        
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('Auth error:', error);
+      } finally {
+        setLoading(false); // Always stop loading
+      }
+    };
 
+    checkUser();
+
+    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.email);
+      
       setUser(session?.user ?? null);
+      
+      // If user just signed in, ensure we're not loading
+      if (event === 'SIGNED_IN') {
+        setLoading(false);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -98,6 +123,18 @@ export default function HomePage() {
 
   const canGenerate = uploadedUrl && selectedTheme && user && !generating;
 
+  // Show loading spinner while checking auth
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-dark-600 text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -124,7 +161,7 @@ export default function HomePage() {
       {/* Main Content */}
       <section className="pb-20 px-4">
         <div className="max-w-5xl mx-auto space-y-12">
-          {/* Step 1: Upload */}
+          {/* Step 1: Upload - ALWAYS VISIBLE */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -256,7 +293,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - Only show if nothing uploaded yet */}
       {!uploadedUrl && (
         <section className="py-20 px-4 bg-white/50">
           <div className="max-w-6xl mx-auto">

@@ -1,5 +1,5 @@
-// FIXED PROMPTS - Preserves original subjects, only changes art style
-// Focus on style, not on changing people's features
+// FLUX-OPTIMIZED - Best quality image-to-image transformation
+// Much better at preserving subjects (people, buildings, landscapes)
 
 import Replicate from 'replicate';
 import type { ThemeStyle } from '@/types';
@@ -8,46 +8,42 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
 });
 
-export const THEME_CONFIG: Record<ThemeStyle, { prompt: string; model: string; negativePrompt: string, strength: number, guidance_scale: number }> = {
+// FLUX.1 Dev - Best model for preserving subjects while applying style
+export const THEME_CONFIG: Record<ThemeStyle, {
+  prompt: string;
+  model: string;
+  strength: number;
+  guidance: number; // FLUX uses 'guidance' not 'guidance_scale'
+}> = {
   'studio-ghibli': {
-    // Focus on clean lines and natural lighting rather than heavy watercolor washes
-    prompt: 'Studio Ghibli hand-drawn anime style, high-definition cel-shaded animation, clean ink lines, soft natural lighting, vibrant but flat colors. Re-render the exact subjects and background of the original image in this animation style.',
-    model: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
-    negativePrompt: 'watercolor, messy paint, landscape, house, room, different person, distorted face, changing the background, blurry, low resolution, 3D render.',
-    strength: 0.50, // Low strength keeps the performer/stage layout identical
-    guidance_scale: 8.5, // High guidance forces the Ghibli colors into the existing shapes
+    prompt: 'Studio Ghibli hand-drawn anime style, soft watercolor aesthetic, gentle pastel colors, painterly backgrounds, whimsical atmosphere, cel animation',
+    model: 'black-forest-labs/flux-dev',
+    strength: 0.68,
+    guidance: 4.3, // FLUX uses lower guidance values (3-4 range is optimal)
   },
   'pixar': {
-    // Focus on surface textures and cinematic lighting for a "toy-like" or high-end 3D feel
-    prompt: 'Cinematic 3D render, stylized digital art, soft global illumination, tactile textures, vibrant but balanced color palette. Re-render the original scene with high-end animated feature film quality, preserving all original shapes and subjects.',
-    model: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
-    negativePrompt: 'flat 2D, sketch, photorealistic, uncanny valley, distorted proportions, scary, grainy.',
-    strength: 0.58, // 3D styles need a slightly higher strength to create the "round" lighting effect
-    guidance_scale: 7.5,
+    prompt: 'Pixar 3D animation style, high-quality CGI rendering, smooth textures, vibrant saturated colors, soft cinematic lighting, rounded character design',
+    model: 'black-forest-labs/flux-dev',
+    strength: 0.68,
+    guidance: 4.4,
   },
   'lofi': {
-    // Keeps the vibe but prevents it from becoming a blurry mess
-    prompt: 'Lofi aesthetic, nostalgic retro film vibe, warm evening lighting, muted pastel tones, clean anime-inspired gradients. Preserve the original details and architecture while applying a cozy, chill atmosphere.',
-    model: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
-    negativePrompt: 'high contrast, sharp digital neon, messy textures, over-saturated, chaotic, modern photorealism.',
-    strength: 0.45, // Keep it very low so it doesn't try to build a "bedroom" around your performer
-    guidance_scale: 7.0,
+    prompt: 'Lofi hip hop aesthetic, chill nostalgic vibes, muted pastel color palette, soft gradients, cozy warm atmosphere, retro 90s anime style',
+    model: 'black-forest-labs/flux-dev',
+    strength: 0.68,
+    guidance: 5.0,
   },
   'cowboy-bebop': {
-    // Focus on "Cel-shading" and "Jazz Noir" lighting
-    prompt: '1990s retro anime style, clean cel-shading, high-contrast shadows, jazz noir cinematic lighting. Apply a bold hand-drawn look to the original scene, maintaining all original structures and features with a vintage film finish.',
-    model: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
-    negativePrompt: '3D render, CGI, soft focus, rounded features, modern digital art, blurry, pastel.',
-    strength: 0.52,
-    guidance_scale: 8.0,
+    prompt: 'Cowboy Bebop 1990s anime style, hand-drawn cel animation, jazz noir atmosphere, bold ink outlines, cinematic composition, retro-futuristic aesthetic',
+    model: 'black-forest-labs/flux-dev',
+    strength: 0.65,
+    guidance: 4.3,
   },
   'spider-verse': {
-    // Uses the "Comic" style as an accent rather than a total distortion
-    prompt: 'Spider-Verse stylized illustration, comic book ink lines, subtle halftone patterns, vibrant street-art color accents. Enhances the original image with rhythmic line-work and artistic chromatic aberration while keeping subjects recognizable.',
-    model: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
-    negativePrompt: 'photorealistic, smooth surfaces, oil painting, traditional, dull colors, simplified shapes.',
-    strength: 0.55,
-    guidance_scale: 9.0, // High guidance is critical here to "force" the halftone dots to appear
+    prompt: 'Spider-Verse movie style, comic book illustration, halftone dot patterns, bold pop art colors, dynamic composition, stylized urban aesthetic, printed comic texture',
+    model: 'black-forest-labs/flux-dev',
+    strength: 0.68,
+    guidance: 5.0, // Higher guidance for more dramatic comic book effect
   },
 };
 
@@ -64,21 +60,25 @@ export async function generateImage(
 
   try {
     const output = await replicate.run(
-      config.model as `${string}/${string}:${string}`,
+      config.model as `${string}/${string}`,
       {
         input: {
           image: imageUrl,
           prompt: prompt,
-          negative_prompt: config.negativePrompt,
-          num_inference_steps: 35, // Higher steps for better details
-          guidance_scale: config.guidance_scale, // Higher guidance keeps it closer to the prompt
-          strength: config.strength, // REDUCED from 0.75 - less transformation, more preservation
+          // FLUX uses different parameter names than SDXL
+          guidance: config.guidance,
+          num_inference_steps: 28,          // FLUX is faster, needs fewer steps
+          output_format: 'png',
+          output_quality: 90,
+          prompt_strength: config.strength, // How much to transform
         },
       }
     );
 
     if (Array.isArray(output) && output.length > 0) {
       return output[0];
+    } else if (typeof output === 'string') {
+      return output;
     }
 
     throw new Error('No image generated');
