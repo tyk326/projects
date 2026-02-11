@@ -1,4 +1,5 @@
 // FRONTEND: Root Layout
+// UPDATED: Clean footer with only Pricing and Contact Us
 
 import './globals.css';
 import type { Metadata } from 'next';
@@ -60,9 +61,11 @@ export default function RootLayout({
           {children}
         </main>
 
+        {/* UPDATED FOOTER - Removed Help Center and Shipping Info */}
         <footer className="border-t border-dark-100 mt-20 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Brand */}
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
@@ -75,27 +78,35 @@ export default function RootLayout({
                 </p>
               </div>
               
+              {/* Product Links */}
               <div>
                 <h3 className="font-semibold text-dark-900 mb-3">Product</h3>
                 <ul className="space-y-2 text-sm text-dark-600">
-                  <li><Link href="/" className="hover:text-dark-900">Create</Link></li>
-                  <li><Link href="/dashboard" className="hover:text-dark-900">My Gallery</Link></li>
-                  <li><a href="#" className="hover:text-dark-900">Pricing</a></li>
+                  <li><Link href="/" className="hover:text-dark-900 transition-colors">Create</Link></li>
+                  <li><Link href="/dashboard" className="hover:text-dark-900 transition-colors">My Gallery</Link></li>
+                  <li><Link href="/pricing" className="hover:text-dark-900 transition-colors">Pricing</Link></li>
                 </ul>
               </div>
               
+              {/* Support - Only Contact Us */}
               <div>
                 <h3 className="font-semibold text-dark-900 mb-3">Support</h3>
                 <ul className="space-y-2 text-sm text-dark-600">
-                  <li><a href="#" className="hover:text-dark-900">Help Center</a></li>
-                  <li><a href="#" className="hover:text-dark-900">Shipping Info</a></li>
-                  <li><a href="#" className="hover:text-dark-900">Contact Us</a></li>
+                  <li><Link href="/contact" className="hover:text-dark-900 transition-colors">Contact Us</Link></li>
+                  <li>
+                    <a 
+                      href="mailto:inkimagined1221@gmail.com" 
+                      className="hover:text-dark-900 transition-colors"
+                    >
+                      inkimagined1221@gmail.com
+                    </a>
+                  </li>
                 </ul>
               </div>
             </div>
             
             <div className="border-t border-dark-100 mt-8 pt-8 text-center text-sm text-dark-500">
-              © 2025 InkImagined. All rights reserved.
+              © 2026 InkImagined. All rights reserved.
             </div>
           </div>
         </footer>

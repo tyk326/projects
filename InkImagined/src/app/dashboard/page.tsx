@@ -1,6 +1,7 @@
 'use client';
 
 // FRONTEND PAGE: User Dashboard
+// FIXED: "Browse Artwork" switches to Generated Images tab instead of redirecting home
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -190,14 +191,28 @@ export default function DashboardPage() {
                   No orders yet
                 </h3>
                 <p className="text-dark-600 mb-6">
-                  Order a canvas print to see your order history here
+                  {images.length > 0 
+                    ? 'Order a canvas print from your generated images'
+                    : 'Create some AI artwork first, then order prints'
+                  }
                 </p>
-                <Link
-                  href="/"
-                  className="inline-block px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-semibold"
-                >
-                  Browse Artwork
-                </Link>
+                
+                {/* FIXED: Smart navigation based on whether user has images */}
+                {images.length > 0 ? (
+                  <button
+                    onClick={() => setActiveTab('images')}
+                    className="inline-block px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-semibold"
+                  >
+                    Browse My Artwork
+                  </button>
+                ) : (
+                  <Link
+                    href="/"
+                    className="inline-block px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-semibold"
+                  >
+                    Create Artwork
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="space-y-6">

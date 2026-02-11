@@ -110,7 +110,6 @@ export default function CheckoutButton({ imageId, disabled }: CheckoutButtonProp
               <li>• High-resolution AI artwork print</li>
               <li>• Ready to hang with mounting hardware</li>
               <li>• Free shipping to US, CA, UK, AU</li>
-              <li>• 100% satisfaction guarantee</li>
             </ul>
           </div>
         </div>
@@ -141,7 +140,7 @@ export default function CheckoutButton({ imageId, disabled }: CheckoutButtonProp
       </button>
 
       <p className="text-xs text-center text-dark-500">
-        Secure checkout powered by Stripe • Ships in 7-10 business days
+        Secure checkout powered by Stripe • Ships in 6-10 business days
       </p>
     </motion.div>
   );

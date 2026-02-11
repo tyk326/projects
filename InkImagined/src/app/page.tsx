@@ -1,9 +1,10 @@
 'use client';
 
 // FRONTEND PAGE: Home / Main Upload & Generation Page
-// FIXED: Handles OAuth redirect and shows upload immediately
+// FIXED: Handles imageId URL parameter for direct checkout from gallery
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase-client';
 import ImageUpload from '@/components/ImageUpload';
@@ -14,14 +15,18 @@ import GenerationLimit from '@/components/GenerationLimit';
 import type { ThemeStyle } from '@/types';
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
+  const imageIdParam = searchParams.get('imageId');
+
   const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
   const [uploadedUrl, setUploadedUrl] = useState('');
   const [selectedTheme, setSelectedTheme] = useState<ThemeStyle | null>(null);
   const [generatedImage, setGeneratedImage] = useState<any>(null);
   const [generating, setGenerating] = useState(false);
   const [generationsRemaining, setGenerationsRemaining] = useState<number | null>(null);
   const [limitError, setLimitError] = useState<string | null>(null);
+  const [loadingImage, setLoadingImage] = useState(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -29,7 +34,6 @@ export default function HomePage() {
     // Check auth status on mount
     const checkUser = async () => {
       try {
-        // Force refresh the session (important after OAuth redirect!)
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -40,7 +44,7 @@ export default function HomePage() {
       } catch (error) {
         console.error('Auth error:', error);
       } finally {
-        setLoading(false); // Always stop loading
+        setLoading(false);
       }
     };
 
@@ -54,7 +58,6 @@ export default function HomePage() {
       
       setUser(session?.user ?? null);
       
-      // If user just signed in, ensure we're not loading
       if (event === 'SIGNED_IN') {
         setLoading(false);
       }
@@ -62,6 +65,54 @@ export default function HomePage() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Load image from gallery if imageId is in URL
+  useEffect(() => {
+    if (imageIdParam && user) {
+      loadImageFromGallery(imageIdParam);
+    }
+  }, [imageIdParam, user]);
+
+  const loadImageFromGallery = async (imageId: string) => {
+    setLoadingImage(true);
+    
+    try {
+      const supabase = createClient();
+      
+      const { data: image, error } = await supabase
+        .from('generated_images')
+        .select('*')
+        .eq('id', imageId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading image:', error);
+        alert('Could not load image. Please try again.');
+        return;
+      }
+
+      if (image) {
+        // Set the image data
+        setGeneratedImage(image);
+        setUploadedUrl(image.original_url);
+        setSelectedTheme(image.theme as ThemeStyle);
+        
+        // Scroll to checkout section
+        setTimeout(() => {
+          const checkoutSection = document.getElementById('checkout-section');
+          if (checkoutSection) {
+            checkoutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error loading image from gallery:', error);
+      alert('Failed to load image. Please try again.');
+    } finally {
+      setLoadingImage(false);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!uploadedUrl || !selectedTheme) {
@@ -93,10 +144,8 @@ export default function HomePage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle limit error specifically
         if (response.status === 429) {
           setLimitError(data.message || 'Daily generation limit reached');
-          // Scroll to limit message
           setTimeout(() => {
             const limitElement = document.getElementById('limit-error');
             if (limitElement) {
@@ -135,53 +184,69 @@ export default function HomePage() {
     );
   }
 
+  // Show loading while fetching image from gallery
+  if (loadingImage) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-dark-600 text-lg">Loading your artwork...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="pt-20 pb-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-dark-900 mb-6 leading-tight">
-              Transform Photos into
-              <span className="block bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
-                AI Art Masterpieces
-              </span>
-            </h1>
-            <p className="text-xl text-dark-600 mb-8 max-w-2xl mx-auto">
-              Upload any photo, choose your favorite artistic style, and get a stunning canvas print delivered to your door
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      {/* Hero Section - Hide if coming from gallery */}
+      {!imageIdParam && (
+        <section className="pt-20 pb-12 px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold text-dark-900 mb-6 leading-tight">
+                Transform Photos into
+                <span className="block bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent">
+                  AI Art Masterpieces
+                </span>
+              </h1>
+              <p className="text-xl text-dark-600 mb-8 max-w-2xl mx-auto">
+                Upload any photo, choose your favorite artistic style, and get a stunning canvas print delivered to your door
+              </p>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Main Content */}
       <section className="pb-20 px-4">
         <div className="max-w-5xl mx-auto space-y-12">
-          {/* Step 1: Upload - ALWAYS VISIBLE */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl shadow-xl p-8"
-          >
-            <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold text-xl">
-                1
+          {/* Step 1: Upload - Only show if not from gallery */}
+          {!imageIdParam && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white rounded-2xl shadow-xl p-8"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold text-xl">
+                  1
+                </div>
+                <h2 className="text-3xl font-bold text-dark-900">Upload Your Photo</h2>
               </div>
-              <h2 className="text-3xl font-bold text-dark-900">Upload Your Photo</h2>
-            </div>
-            <ImageUpload 
-              onUpload={setUploadedUrl} 
-              disabled={generating}
-            />
-          </motion.div>
+              <ImageUpload 
+                onUpload={setUploadedUrl} 
+                disabled={generating}
+              />
+            </motion.div>
+          )}
 
-          {/* Step 2: Select Theme */}
-          {uploadedUrl && (
+          {/* Step 2: Select Theme - Only show if not from gallery */}
+          {uploadedUrl && !imageIdParam && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -194,7 +259,6 @@ export default function HomePage() {
                 <h2 className="text-3xl font-bold text-dark-900">Pick an Art Style</h2>
               </div>
 
-              {/* Generation Limit Display */}
               {user && (
                 <div className="mb-6">
                   <GenerationLimit 
@@ -203,7 +267,6 @@ export default function HomePage() {
                 </div>
               )}
 
-              {/* Limit Error Message */}
               {limitError && (
                 <motion.div
                   id="limit-error"
@@ -263,42 +326,44 @@ export default function HomePage() {
             </motion.div>
           )}
 
-          {/* Step 3: Preview & Checkout */}
-          {(generating || generatedImage) && (
+          {/* Step 3: Preview & Checkout - Show for gallery images OR generated images */}
+          {generatedImage && (
             <motion.div
+              id="checkout-section"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-2xl shadow-xl p-8"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold text-xl">
-                  3
+                  {imageIdParam ? '✓' : '3'}
                 </div>
-                <h2 className="text-3xl font-bold text-dark-900">Preview & Order</h2>
+                <h2 className="text-3xl font-bold text-dark-900">
+                  {imageIdParam ? 'Order Your Canvas Print' : 'Preview & Order'}
+                </h2>
               </div>
               
+              {/* Show preview even when coming from gallery */}
               <PreviewGallery
-                originalUrl={uploadedUrl}
-                generatedUrl={generatedImage?.generated_url}
-                generating={generating}
+                originalUrl={uploadedUrl || generatedImage.original_url}
+                generatedUrl={generatedImage.generated_url}
+                generating={false}
               />
 
-              {generatedImage && !generating && (
-                <div className="mt-8">
-                  <CheckoutButton imageId={generatedImage.id} />
-                </div>
-              )}
+              <div className="mt-8">
+                <CheckoutButton imageId={generatedImage.id} />
+              </div>
             </motion.div>
           )}
         </div>
       </section>
 
-      {/* Features Section - Only show if nothing uploaded yet */}
-      {!uploadedUrl && (
+      {/* Features Section - Only show if not from gallery and nothing uploaded */}
+      {!uploadedUrl && !imageIdParam && (
         <section className="py-20 px-4 bg-white/50">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-center text-dark-900 mb-12">
-              Why Choose AI Canvas?
+              Why Choose InkImagined?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <motion.div
@@ -345,7 +410,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="font-bold text-xl text-dark-900 mb-2">Fast Shipping</h3>
                 <p className="text-dark-600">
-                  Free worldwide shipping with tracking. Arrives in 7-10 business days
+                  Free worldwide shipping with tracking. Arrives in 6-10 business days
                 </p>
               </motion.div>
             </div>

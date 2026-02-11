@@ -1,12 +1,13 @@
 // BACKEND API ROUTE: Create Stripe checkout session
+// FIXED: Correct import path for supabase-server
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient, supabaseAdmin } from '@/lib/supabase-server';
+import { createServerSupabaseClient } from '@/lib/supabase-server'; // ← FIXED!
 import { createCheckoutSession } from '@/lib/stripe';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = await createServerSupabaseClient(); // ← FIXED: Added await
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -20,6 +21,12 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { imageId, productId } = body;
+
+    console.log('🛒 Checkout request:', {
+      imageId,
+      productId,
+      userId: user.id,
+    });
 
     if (!imageId || !productId) {
       return NextResponse.json(
@@ -37,19 +44,25 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (imageError || !image) {
+      console.error('Image not found:', imageError);
       return NextResponse.json(
         { error: 'Image not found' },
         { status: 404 }
       );
     }
 
-    // Create Stripe checkout session
+    console.log('✅ Image verified, creating checkout session...');
+
+    // Create Stripe checkout session (metadata is passed inside createCheckoutSession)
     const session = await createCheckoutSession(
       imageId,
       productId,
       user.id,
       image.generated_url
     );
+
+    console.log('✅ Checkout session created:', session.id);
+    console.log('📋 Metadata:', session.metadata);
 
     return NextResponse.json({
       success: true,
