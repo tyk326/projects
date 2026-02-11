@@ -43,9 +43,9 @@ export default function RootLayout({
                   InkImagined
                 </span>
               </Link>
-              
+
               <div className="flex items-center gap-6">
-                <Link 
+                <Link
                   href="/dashboard"
                   className="text-dark-700 hover:text-dark-900 font-medium transition-colors"
                 >
@@ -77,7 +77,7 @@ export default function RootLayout({
                   Transform your photos into stunning AI-generated artwork on premium canvas prints.
                 </p>
               </div>
-              
+
               {/* Product Links */}
               <div>
                 <h3 className="font-semibold text-dark-900 mb-3">Product</h3>
@@ -87,15 +87,15 @@ export default function RootLayout({
                   <li><Link href="/pricing" className="hover:text-dark-900 transition-colors">Pricing</Link></li>
                 </ul>
               </div>
-              
+
               {/* Support - Only Contact Us */}
               <div>
                 <h3 className="font-semibold text-dark-900 mb-3">Support</h3>
                 <ul className="space-y-2 text-sm text-dark-600">
-                  <li><Link href="/contact" className="hover:text-dark-900 transition-colors">Contact Us</Link></li>
+                  {/* <li><Link href="/contact" className="hover:text-dark-900 transition-colors">Contact Us</Link></li> */}
                   <li>
-                    <a 
-                      href="mailto:inkimagined1221@gmail.com" 
+                    <a
+                      href="mailto:inkimagined1221@gmail.com"
                       className="hover:text-dark-900 transition-colors"
                     >
                       inkimagined1221@gmail.com
@@ -104,7 +104,7 @@ export default function RootLayout({
                 </ul>
               </div>
             </div>
-            
+
             <div className="border-t border-dark-100 mt-8 pt-8 text-center text-sm text-dark-500">
               © 2026 InkImagined. All rights reserved.
             </div>

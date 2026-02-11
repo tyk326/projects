@@ -13,7 +13,8 @@ export async function sendOrderConfirmationEmail(
 ): Promise<void> {
   try {
     await resend.emails.send({
-      from: 'tylerkb2004@gmail.com',
+      from: 'InkImagined <onboarding@resend.dev>',
+      reply_to: 'inkimagined@gmail.com',
       to: email,
       subject: 'Your Canvas Print Order Confirmed! 🎨',
       html: `
@@ -88,7 +89,8 @@ export async function sendShippingNotificationEmail(
 ): Promise<void> {
   try {
     await resend.emails.send({
-      from: 'tylerbk2004@gmail.com',
+      from: 'InkImagined <onboarding@resend.dev>',
+      reply_to: 'inkimagined@gmail.com',
       to: email,
       subject: 'Your Canvas Print Has Shipped! 📦',
       html: `

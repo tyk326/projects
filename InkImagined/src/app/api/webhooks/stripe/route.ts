@@ -95,13 +95,30 @@ export async function POST(request: NextRequest) {
 
           console.log('✅ Test order created in database:', order.id);
           console.log('❌ Skipped Printful order (test mode)');
-          console.log('❌ Skipped confirmation email (test mode)');
+
+          // ✅ SEND EMAIL IN TEST MODE TOO
+          const { data: image } = await supabaseAdmin
+            .from('generated_images')
+            .select('generated_url')
+            .eq('id', image_id)
+            .single();
+
+          if (shippingAddress.email && image) {
+            await sendOrderConfirmationEmail(
+              shippingAddress.email,
+              order.id,
+              image.generated_url,
+              product_id,
+              session.amount_total || 0
+            );
+            console.log('✅ TEST email sent to:', shippingAddress.email);
+          }
 
           return NextResponse.json({
             received: true,
             testMode: true,
             orderId: order.id,
-            message: 'Test payment processed - no real order/email sent'
+            emailSent: true,
           });
         }
 

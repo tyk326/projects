@@ -1,5 +1,5 @@
 // BACKEND API ROUTE: Generate AI-styled image using Replicate
-// FIXED: Proper timezone handling for midnight reset
+// UPDATED: Added canvas size parameter for aspect ratio control
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient, supabaseAdmin } from '@/lib/supabase-server';
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { imageUrl, theme, customPrompt } = body;
+    const { imageUrl, theme, customPrompt, canvasSize } = body; // ✅ ADDED: canvasSize
 
     if (!imageUrl || !theme) {
       return NextResponse.json(
@@ -132,8 +132,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate AI image
-    const generatedUrl = await generateImage(imageUrl, theme, customPrompt);
+    console.log('🎨 Generating image:', {
+      theme,
+      canvasSize: canvasSize || 'default (4:5)',
+      userId: user.id,
+    });
+
+    // ✅ UPDATED: Pass canvas size to generateImage
+    const generatedUrl = await generateImage(imageUrl, theme, canvasSize, customPrompt);
 
     // Download the generated image
     const imageResponse = await fetch(generatedUrl);
@@ -161,7 +167,7 @@ export async function POST(request: NextRequest) {
       .from('generated')
       .getPublicUrl(fileName);
 
-    // Save to database
+    // ✅ UPDATED: Save canvas_size to database
     const { data: dbData, error: dbError } = await supabaseAdmin
       .from('generated_images')
       .insert({
@@ -170,6 +176,7 @@ export async function POST(request: NextRequest) {
         generated_url: publicUrl,
         theme: theme,
         custom_prompt: customPrompt || null,
+        canvas_size: canvasSize || null, // ✅ ADDED: Store canvas size
       })
       .select()
       .maybeSingle();
@@ -200,6 +207,9 @@ export async function POST(request: NextRequest) {
     }
 
     const remaining = DAILY_GENERATION_LIMIT - generationsToday;
+
+    console.log('✅ Image generated successfully!');
+    console.log(`📊 Generations: ${generationsToday}/${DAILY_GENERATION_LIMIT} (${remaining} remaining)`);
 
     return NextResponse.json({
       success: true,

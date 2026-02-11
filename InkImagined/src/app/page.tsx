@@ -1,13 +1,14 @@
 'use client';
 
 // FRONTEND PAGE: Home / Main Upload & Generation Page
-// FIXED: Handles imageId URL parameter for direct checkout from gallery
+// UPDATED FLOW: Upload → Size → Theme → Generate → Order
 
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase-client';
 import ImageUpload from '@/components/ImageUpload';
+import CanvasSizeSelector from '@/components/CanvasSizeSelector';
 import ThemeSelector from '@/components/ThemeSelector';
 import PreviewGallery from '@/components/PreviewGallery';
 import CheckoutButton from '@/components/CheckoutButton';
@@ -21,6 +22,7 @@ export default function HomePage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [uploadedUrl, setUploadedUrl] = useState('');
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedTheme, setSelectedTheme] = useState<ThemeStyle | null>(null);
   const [generatedImage, setGeneratedImage] = useState<any>(null);
   const [generating, setGenerating] = useState(false);
@@ -31,15 +33,10 @@ export default function HomePage() {
   useEffect(() => {
     const supabase = createClient();
     
-    // Check auth status on mount
     const checkUser = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          console.error('Error getting session:', error);
-        }
-        
+        if (error) console.error('Error getting session:', error);
         setUser(session?.user ?? null);
       } catch (error) {
         console.error('Auth error:', error);
@@ -50,17 +47,11 @@ export default function HomePage() {
 
     checkUser();
 
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state changed:', event, session?.user?.email);
-      
       setUser(session?.user ?? null);
-      
-      if (event === 'SIGNED_IN') {
-        setLoading(false);
-      }
+      if (event === 'SIGNED_IN') setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -93,12 +84,11 @@ export default function HomePage() {
       }
 
       if (image) {
-        // Set the image data
         setGeneratedImage(image);
         setUploadedUrl(image.original_url);
         setSelectedTheme(image.theme as ThemeStyle);
+        // Note: We don't know the canvas size for old images
         
-        // Scroll to checkout section
         setTimeout(() => {
           const checkoutSection = document.getElementById('checkout-section');
           if (checkoutSection) {
@@ -115,8 +105,8 @@ export default function HomePage() {
   };
 
   const handleGenerate = async () => {
-    if (!uploadedUrl || !selectedTheme) {
-      alert('Please upload an image and select a theme');
+    if (!uploadedUrl || !selectedTheme || !selectedSize) {
+      alert('Please upload an image, select a canvas size, and choose a theme');
       return;
     }
 
@@ -138,6 +128,7 @@ export default function HomePage() {
         body: JSON.stringify({
           imageUrl: uploadedUrl,
           theme: selectedTheme,
+          canvasSize: selectedSize, // ← NEW: Pass canvas size!
         }),
       });
 
@@ -170,9 +161,8 @@ export default function HomePage() {
     }
   };
 
-  const canGenerate = uploadedUrl && selectedTheme && user && !generating;
+  const canGenerate = uploadedUrl && selectedSize && selectedTheme && user && !generating;
 
-  // Show loading spinner while checking auth
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -184,7 +174,6 @@ export default function HomePage() {
     );
   }
 
-  // Show loading while fetching image from gallery
   if (loadingImage) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -214,7 +203,7 @@ export default function HomePage() {
                 </span>
               </h1>
               <p className="text-xl text-dark-600 mb-8 max-w-2xl mx-auto">
-                Upload any photo, choose your favorite artistic style, and get a stunning canvas print delivered to your door
+                Upload any photo, choose your canvas size and artistic style, and get a stunning canvas print delivered to your door
               </p>
             </motion.div>
           </div>
@@ -245,7 +234,7 @@ export default function HomePage() {
             </motion.div>
           )}
 
-          {/* Step 2: Select Theme - Only show if not from gallery */}
+          {/* Step 2: Select Canvas Size - NEW STEP! */}
           {uploadedUrl && !imageIdParam && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -255,6 +244,28 @@ export default function HomePage() {
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold text-xl">
                   2
+                </div>
+                <h2 className="text-3xl font-bold text-dark-900">Choose Your Canvas Size</h2>
+              </div>
+              
+              <CanvasSizeSelector
+                selected={selectedSize}
+                onSelect={setSelectedSize}
+                disabled={generating}
+              />
+            </motion.div>
+          )}
+
+          {/* Step 3: Select Theme */}
+          {uploadedUrl && selectedSize && !imageIdParam && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white rounded-2xl shadow-xl p-8"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold text-xl">
+                  3
                 </div>
                 <h2 className="text-3xl font-bold text-dark-900">Pick an Art Style</h2>
               </div>
@@ -326,7 +337,7 @@ export default function HomePage() {
             </motion.div>
           )}
 
-          {/* Step 3: Preview & Checkout - Show for gallery images OR generated images */}
+          {/* Step 4: Preview & Checkout */}
           {generatedImage && (
             <motion.div
               id="checkout-section"
@@ -336,14 +347,13 @@ export default function HomePage() {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 rounded-full bg-primary-500 text-white flex items-center justify-center font-bold text-xl">
-                  {imageIdParam ? '✓' : '3'}
+                  {imageIdParam ? '✓' : '4'}
                 </div>
                 <h2 className="text-3xl font-bold text-dark-900">
                   {imageIdParam ? 'Order Your Canvas Print' : 'Preview & Order'}
                 </h2>
               </div>
               
-              {/* Show preview even when coming from gallery */}
               <PreviewGallery
                 originalUrl={uploadedUrl || generatedImage.original_url}
                 generatedUrl={generatedImage.generated_url}
@@ -358,12 +368,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section - Only show if not from gallery and nothing uploaded */}
+      {/* Features Section */}
       {!uploadedUrl && !imageIdParam && (
         <section className="py-20 px-4 bg-white/50">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-4xl font-bold text-center text-dark-900 mb-12">
-              Why Choose InkImagined?
+              Why Choose AI Canvas?
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <motion.div
@@ -392,9 +402,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 mx-auto mb-4 bg-primary-100 rounded-2xl flex items-center justify-center">
                   <span className="text-3xl">🖼️</span>
                 </div>
-                <h3 className="font-bold text-xl text-dark-900 mb-2">Premium Quality</h3>
+                <h3 className="font-bold text-xl text-dark-900 mb-2">Perfect Fit</h3>
                 <p className="text-dark-600">
-                  Museum-grade canvas prints with gallery-wrapped edges and mounting hardware
+                  Choose your size first - we generate artwork in the exact aspect ratio for zero cropping
                 </p>
               </motion.div>
 
