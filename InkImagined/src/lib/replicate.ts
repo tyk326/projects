@@ -1,5 +1,5 @@
-// FLUX-OPTIMIZED - Best quality image-to-image transformation
-// Much better at preserving subjects (people, buildings, landscapes)
+// OPTIMIZED FLUX PROMPTS - Best practices for style transfer
+// Focus on art style, not content transformation
 
 import Replicate from 'replicate';
 import type { ThemeStyle } from '@/types';
@@ -8,42 +8,46 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
 });
 
-// FLUX.1 Dev - Best model for preserving subjects while applying style
-export const THEME_CONFIG: Record<ThemeStyle, {
-  prompt: string;
-  model: string;
+export const THEME_CONFIG: Record<ThemeStyle, { 
+  prompt: string; 
+  model: string; 
   strength: number;
-  guidance: number; // FLUX uses 'guidance' not 'guidance_scale'
+  guidance: number;
 }> = {
   'studio-ghibli': {
-    prompt: 'Studio Ghibli hand-drawn anime style, soft watercolor aesthetic, gentle pastel colors, painterly backgrounds, whimsical atmosphere, cel animation',
+    // ✅ References iconic movies, focuses on technique not content
+    prompt: 'Studio Ghibli hand-drawn anime style by Hayao Miyazaki, soft watercolor aesthetic inspired by Spirited Away and Howl\'s Moving Castle, gentle pastel colors, painterly backgrounds, whimsical atmosphere, traditional cel animation technique, maintain original subjects and composition',
     model: 'black-forest-labs/flux-dev',
-    strength: 0.68,
-    guidance: 4.3, // FLUX uses lower guidance values (3-4 range is optimal)
+    strength: 0.69,  // Slightly lower to preserve subjects better
+    guidance: 5.0,   // Lower guidance for softer Ghibli aesthetic
   },
   'pixar': {
-    prompt: 'Pixar 3D animation style, high-quality CGI rendering, smooth textures, vibrant saturated colors, soft cinematic lighting, rounded character design',
+    // ✅ References style, specifies technique
+    prompt: 'Pixar Animation Studios 3D CGI style like Coco, Up and Toy Story, high-quality rendering, smooth character textures, vibrant saturated colors, soft cinematic lighting, rounded friendly character design, maintain original subjects and poses',
     model: 'black-forest-labs/flux-dev',
-    strength: 0.68,
-    guidance: 4.4,
+    strength: 0.70,
+    guidance: 5.5,
   },
   'lofi': {
-    prompt: 'Lofi hip hop aesthetic, chill nostalgic vibes, muted pastel color palette, soft gradients, cozy warm atmosphere, retro 90s anime style',
+    // ✅ Focuses on aesthetic/mood, no specific movies needed (it's a style)
+    prompt: 'Lofi hip hop aesthetic, chill nostalgic vibes, muted pastel color palette, soft gradients, cozy warm atmosphere, retro 90s anime style, StudyGirl aesthetic, maintain original scene composition',
     model: 'black-forest-labs/flux-dev',
-    strength: 0.68,
-    guidance: 5.0,
+    strength: 0.68,  // Lower for subtle lofi effect
+    guidance: 5.4,
   },
   'cowboy-bebop': {
-    prompt: 'Cowboy Bebop 1990s anime style, hand-drawn cel animation, jazz noir atmosphere, bold ink outlines, cinematic composition, retro-futuristic aesthetic',
+    // ✅ References the series, focuses on visual technique
+    prompt: 'Cowboy Bebop anime style by Shinichiro Watanabe, 1990s hand-drawn cel animation, jazz noir atmosphere, bold ink outlines, cinematic composition, retro-futuristic aesthetic, film grain texture, maintain original subjects',
     model: 'black-forest-labs/flux-dev',
-    strength: 0.65,
-    guidance: 4.3,
+    strength: 0.67,
+    guidance: 4.9,
   },
   'spider-verse': {
-    prompt: 'Spider-Verse movie style, comic book illustration, halftone dot patterns, bold pop art colors, dynamic composition, stylized urban aesthetic, printed comic texture',
+    // ✅ References the movie, specifies comic book techniques
+    prompt: 'Comic illustration inspired by Spider-Verse, hand-drawn cel animation with bold black ink outlines, vibrant pop art colors, dynamic composition, stylized non-realistic characters, painted backgrounds with halftone accents, maintain original subjects and poses',
     model: 'black-forest-labs/flux-dev',
-    strength: 0.68,
-    guidance: 5.0, // Higher guidance for more dramatic comic book effect
+    strength: 0.72,
+    guidance: 5.3,  // Higher for bold comic effect
   },
 };
 
@@ -65,12 +69,11 @@ export async function generateImage(
         input: {
           image: imageUrl,
           prompt: prompt,
-          // FLUX uses different parameter names than SDXL
           guidance: config.guidance,
-          num_inference_steps: 28,          // FLUX is faster, needs fewer steps
+          num_inference_steps: 28,
           output_format: 'png',
           output_quality: 90,
-          prompt_strength: config.strength, // How much to transform
+          prompt_strength: config.strength,
         },
       }
     );
