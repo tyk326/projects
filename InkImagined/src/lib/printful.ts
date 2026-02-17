@@ -6,12 +6,11 @@ import type { ShippingAddress } from '@/types';
 const PRINTFUL_API_URL = 'https://api.printful.com';
 const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY!;
 
-// Canvas size to required pixel dimensions for 300 DPI
-// Formula: inches × 300 DPI = pixels needed
-const CANVAS_DPI_REQUIREMENTS = {
-  '9x12': { width: 2700, height: 3600 },   // 9" × 300 DPI = 2700px
-  '12x16': { width: 3600, height: 4800 },  // 12" × 300 DPI = 3600px
-  '16x20': { width: 4800, height: 6000 },  // 16" × 300 DPI = 4800px
+// and define the horizontal dimensions properly.
+const CANVAS_PHYSICAL_SIZE = {
+  '12x9': { width: 12, height: 9 },   // Landscape: 12" wide, 9" tall
+  '16x12': { width: 16, height: 12 },
+  '20x16': { width: 20, height: 16 },
 };
 
 interface PrintfulOrderItem {
@@ -20,10 +19,14 @@ interface PrintfulOrderItem {
   files: Array<{
     url: string;
     type: 'default';
-    options?: Array<{
-      id: string;
-      value: string;
-    }>;
+    position: {
+      area_width: number;
+      area_height: number;
+      width: number;
+      height: number;
+      top: number;
+      left: number;
+    };
   }>;
 }
 
@@ -67,16 +70,18 @@ export async function createPrintfulOrder(
   orderValue: number,
   canvasSize: string // e.g., '12x16'
 ): Promise<{ id: number; status: string }> {
-  
+
   // ✅ Determine orientation based on canvas size
   // All your canvases are portrait (height > width)
   const orientation = 'horizontal'; // or 'horizontal' if you switch to landscape
-  
+
   console.log('📦 Creating Printful order:', {
     variantId,
     orientation,
     canvasSize,
   });
+
+  const dimensions = CANVAS_PHYSICAL_SIZE[canvasSize as keyof typeof CANVAS_PHYSICAL_SIZE];
 
   const orderData: PrintfulOrderRequest = {
     recipient: {
@@ -98,13 +103,16 @@ export async function createPrintfulOrder(
           {
             url: imageUrl,
             type: 'default',
-            // ✅ CRITICAL: Specify orientation
-            options: [
-              {
-                id: 'print_orientation',
-                value: orientation, // 'horizontal' or 'vertical'
-              },
-            ],
+            // ✅ THIS defines the horizontal orientation
+            position: {
+              // ✅ Use INCHES here, not pixels
+              area_width: dimensions.width,
+              area_height: dimensions.height,
+              width: dimensions.width,
+              height: dimensions.height,
+              top: 0,
+              left: 0
+            },
           },
         ],
       },
@@ -113,7 +121,7 @@ export async function createPrintfulOrder(
 
   try {
     const response = await printfulRequest('/orders', 'POST', orderData);
-    
+
     console.log('✅ Printful order created:', {
       id: response.result.id,
       status: response.result.status,
@@ -135,13 +143,13 @@ export function calculateImageDPI(
   imageHeight: number,
   canvasSize: string
 ): number {
-  const requirements = CANVAS_DPI_REQUIREMENTS[canvasSize as keyof typeof CANVAS_DPI_REQUIREMENTS];
-  
+  const requirements = CANVAS_PHYSICAL_SIZE[canvasSize as keyof typeof CANVAS_PHYSICAL_SIZE];
+
   if (!requirements) return 0;
 
   // Calculate DPI based on width (assuming portrait orientation)
-  const dpi = (imageWidth / (requirements.width / 300));
-  
+  const dpi = (imageWidth / (requirements.width));
+
   return Math.round(dpi);
 }
 
@@ -156,8 +164,8 @@ export function checkImageQuality(
   recommendedDPI: number;
   message: string;
 } {
-  const requirements = CANVAS_DPI_REQUIREMENTS[canvasSize as keyof typeof CANVAS_DPI_REQUIREMENTS];
-  
+  const requirements = CANVAS_PHYSICAL_SIZE[canvasSize as keyof typeof CANVAS_PHYSICAL_SIZE];
+
   if (!requirements) {
     return {
       meetsRequirement: false,
