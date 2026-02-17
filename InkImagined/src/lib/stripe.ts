@@ -10,25 +10,31 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 // Canvas product pricing
 export const CANVAS_PRODUCTS = [
   {
-    id: 'canvas-9x12', // printful cost is $16.32
-    name: '9" × 12" Canvas',
-    size: '9x12',
+    id: 'canvas-12x9', // printful cost is $16.32
+    name: '12" × 9" Canvas',
+    size: '12x9',
     price: 3899, // $38.99 in cents
-    printful_variant_id: 4438, // Replace with actual Printful variant ID
+    printful_variant_id: '6994c79e6fc281', // Replace with actual Printful variant ID
+    aspectRatio: '4:3', // Landscape
+    description: 'Perfect for desk or small wall spaces',
   },
   {
-    id: 'canvas-12x16', // printful cost is $23.41
-    name: '12" × 16" Canvas',
-    size: '12x16',
+    id: 'canvas-16x12', // printful cost is $23.41
+    name: '16" × 12" Canvas',
+    size: '16x12',
     price: 5099, // $50.99 in cents
-    printful_variant_id: 4440, // Replace with actual Printful variant ID
+    printful_variant_id: '6994c79e6fc328', // Replace with actual Printful variant ID
+    aspectRatio: '4:3', // Landscape
+    description: 'Most popular - great for any room',
   },
   {
-    id: 'canvas-16x20', // printful cost is $28.56
-    name: '16" × 20" Canvas',
-    size: '16x20',
+    id: 'canvas-20x16', // printful cost is $28.56
+    name: '20" × 16" Canvas',
+    size: '20x16',
     price: 6799, // $67.99 in cents
-    printful_variant_id: 4442, // Replace with actual Printful variant ID
+    printful_variant_id: '6994c79e6fc399', // Replace with actual Printful variant ID
+    aspectRatio: '5:4', // Landscape
+    description: 'Statement piece - impressive size',
   },
 ];
 
@@ -39,7 +45,7 @@ export async function createCheckoutSession(
   imageUrl: string
 ): Promise<Stripe.Checkout.Session> {
   const product = CANVAS_PRODUCTS.find(p => p.id === productId);
-  
+
   if (!product) {
     throw new Error('Invalid product');
   }

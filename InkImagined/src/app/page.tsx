@@ -14,6 +14,7 @@ import PreviewGallery from '@/components/PreviewGallery';
 import CheckoutButton from '@/components/CheckoutButton';
 import GenerationLimit from '@/components/GenerationLimit';
 import type { ThemeStyle } from '@/types';
+import CanvasMockup from '@/components/CanvasMockup';
 
 export default function HomePage() {
   const searchParams = useSearchParams();
@@ -32,7 +33,7 @@ export default function HomePage() {
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     const checkUser = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -66,10 +67,10 @@ export default function HomePage() {
 
   const loadImageFromGallery = async (imageId: string) => {
     setLoadingImage(true);
-    
+
     try {
       const supabase = createClient();
-      
+
       const { data: image, error } = await supabase
         .from('generated_images')
         .select('*')
@@ -88,7 +89,7 @@ export default function HomePage() {
         setUploadedUrl(image.original_url);
         setSelectedTheme(image.theme as ThemeStyle);
         // Note: We don't know the canvas size for old images
-        
+
         setTimeout(() => {
           const checkoutSection = document.getElementById('checkout-section');
           if (checkoutSection) {
@@ -227,8 +228,8 @@ export default function HomePage() {
                 </div>
                 <h2 className="text-3xl font-bold text-dark-900">Upload Your Photo</h2>
               </div>
-              <ImageUpload 
-                onUpload={setUploadedUrl} 
+              <ImageUpload
+                onUpload={setUploadedUrl}
                 disabled={generating}
               />
             </motion.div>
@@ -247,7 +248,7 @@ export default function HomePage() {
                 </div>
                 <h2 className="text-3xl font-bold text-dark-900">Choose Your Canvas Size</h2>
               </div>
-              
+
               <CanvasSizeSelector
                 selected={selectedSize}
                 onSelect={setSelectedSize}
@@ -272,7 +273,7 @@ export default function HomePage() {
 
               {user && (
                 <div className="mb-6">
-                  <GenerationLimit 
+                  <GenerationLimit
                     onLimitUpdate={(remaining) => setGenerationsRemaining(remaining)}
                   />
                 </div>
@@ -298,13 +299,13 @@ export default function HomePage() {
                   </div>
                 </motion.div>
               )}
-              
+
               <ThemeSelector
                 selected={selectedTheme}
                 onSelect={setSelectedTheme}
                 disabled={generating}
               />
-              
+
               <div className="mt-8">
                 <button
                   onClick={handleGenerate}
@@ -353,12 +354,20 @@ export default function HomePage() {
                   {imageIdParam ? 'Order Your Canvas Print' : 'Preview & Order'}
                 </h2>
               </div>
-              
+
               <PreviewGallery
                 originalUrl={uploadedUrl || generatedImage.original_url}
                 generatedUrl={generatedImage.generated_url}
                 generating={false}
               />
+
+              {/* ✅ ADD THIS: Canvas Mockup Preview */}
+              <div className="mt-12">
+                <CanvasMockup
+                  imageUrl={generatedImage.generated_url}
+                  canvasSize={selectedSize || generatedImage.canvas_size}
+                />
+              </div>
 
               <div className="mt-8">
                 <CheckoutButton imageId={generatedImage.id} />

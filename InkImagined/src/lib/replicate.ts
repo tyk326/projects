@@ -1,5 +1,5 @@
-// FLUX IMAGE GENERATION WITH CANVAS ASPECT RATIOS
-// Generates images that perfectly fit canvas sizes
+// BACKEND UTILITY: Replicate API for AI Image Generation
+// UPDATED: LANDSCAPE orientation (horizontal) with high DPI
 
 import Replicate from 'replicate';
 import type { ThemeStyle } from '@/types';
@@ -8,18 +8,36 @@ const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
 });
 
-// ✅ UPDATED: Map canvas sizes directly to valid FLUX aspect ratios
-export const CANVAS_ASPECT_RATIOS = {
-  'canvas-9x12': '3:4',   // 9x12 inches → 3:4 ratio
-  'canvas-12x16': '3:4',  // 12x16 inches → 3:4 ratio
-  'canvas-16x20': '4:5',  // 16x20 inches → 4:5 ratio
-} as const;
+// Canvas dimensions for HIGH QUALITY PRINTING - LANDSCAPE ORIENTATION
+// Target: 200 DPI minimum for good print quality
+// Landscape = wider than tall (horizontal on wall)
+export const CANVAS_DIMENSIONS = {
+  'canvas-9x12': { 
+    width: 2400,   // 12" × 200 DPI (LANDSCAPE: wider dimension)
+    height: 1800,  // 9" × 200 DPI
+    aspectRatio: '4:3',
+    orientation: 'landscape'
+  },
+  'canvas-12x16': { 
+    width: 3200,   // 16" × 200 DPI (LANDSCAPE: wider dimension)
+    height: 2400,  // 12" × 200 DPI
+    aspectRatio: '4:3',
+    orientation: 'landscape'
+  },
+  'canvas-16x20': { 
+    width: 4000,   // 20" × 200 DPI (LANDSCAPE: wider dimension)
+    height: 3200,  // 16" × 200 DPI
+    aspectRatio: '5:4',
+    orientation: 'landscape'
+  },
+};
 
-export const THEME_CONFIG: Record<ThemeStyle, {
-  prompt: string;
+// Theme-specific prompts and models
+export const THEME_CONFIG: Record<ThemeStyle, { 
+  prompt: string; 
   model: string;
-  strength: number;
-  guidance: number;
+  strength?: number;
+  guidance?: number;
 }> = {
   'studio-ghibli': {
     prompt: 'Studio Ghibli hand-drawn anime style by Hayao Miyazaki, soft watercolor aesthetic inspired by Spirited Away and Howl\'s Moving Castle, gentle pastel colors, painterly backgrounds, whimsical atmosphere, traditional cel animation technique, maintain original subjects and composition',
@@ -36,8 +54,8 @@ export const THEME_CONFIG: Record<ThemeStyle, {
   'lofi': {
     prompt: 'Lofi hip hop aesthetic, chill nostalgic vibes, muted pastel color palette, soft gradients, cozy warm atmosphere, retro 90s anime style, StudyGirl aesthetic, maintain original scene composition',
     model: 'black-forest-labs/flux-dev',
-    strength: 0.68,
-    guidance: 5.4,
+    strength: 0.63,
+    guidance: 5.0,
   },
   'cowboy-bebop': {
     prompt: 'Cowboy Bebop anime style by Shinichiro Watanabe, 1990s hand-drawn cel animation, jazz noir atmosphere, bold ink outlines, cinematic composition, retro-futuristic aesthetic, film grain texture, maintain original subjects',
@@ -56,63 +74,108 @@ export const THEME_CONFIG: Record<ThemeStyle, {
 export async function generateImage(
   imageUrl: string,
   theme: ThemeStyle,
-  canvasSize?: string,
+  canvasSize?: string, // e.g., 'canvas-12x16'
   customPrompt?: string
 ): Promise<string> {
   const config = THEME_CONFIG[theme];
-
-  const prompt = customPrompt
-    ? `${customPrompt}, ${config.prompt}`
+  
+  const prompt = customPrompt 
+    ? `${customPrompt}, ${config.prompt}` 
     : config.prompt;
 
-  // ✅ FIXED: Get aspect ratio string instead of dimensions
-  const validAspectRatios = [
-    "1:1", "16:9", "21:9", "3:2", "2:3", 
-    "4:5", "5:4", "3:4", "4:3", "9:16", "9:21"
-  ];
+  // ✅ Get LANDSCAPE dimensions based on canvas size (with high DPI)
+  const dimensions = canvasSize && CANVAS_DIMENSIONS[canvasSize as keyof typeof CANVAS_DIMENSIONS]
+    ? CANVAS_DIMENSIONS[canvasSize as keyof typeof CANVAS_DIMENSIONS]
+    : { width: 3200, height: 2400, aspectRatio: '4:3', orientation: 'landscape' }; // Default 16×12 landscape
 
-  let aspectRatio = '4:5'; // Default aspect ratio
-
-  if (canvasSize && CANVAS_ASPECT_RATIOS[canvasSize as keyof typeof CANVAS_ASPECT_RATIOS]) {
-    aspectRatio = CANVAS_ASPECT_RATIOS[canvasSize as keyof typeof CANVAS_ASPECT_RATIOS];
-  }
-
-  // Validate aspect ratio
-  if (!validAspectRatios.includes(aspectRatio)) {
-    console.warn(`Invalid aspect ratio ${aspectRatio}, using default 4:5`);
-    aspectRatio = '4:5';
-  }
-
-  console.log('🎨 Generating with aspect ratio:', aspectRatio);
+  console.log('🎨 Generating HIGH-RES LANDSCAPE image:', {
+    theme,
+    canvasSize: canvasSize || 'default (16x12)',
+    dimensions: `${dimensions.width}×${dimensions.height}`,
+    aspectRatio: dimensions.aspectRatio,
+    orientation: dimensions.orientation,
+    estimatedDPI: Math.round(dimensions.width / parseInt(canvasSize?.split('x')[1] || '16')), // Landscape uses height as reference
+  });
 
   try {
     const output = await replicate.run(
-      config.model as `${string}/${string}`,
+      config.model as `${string}/${string}:${string}`,
       {
         input: {
           image: imageUrl,
           prompt: prompt,
-          guidance: config.guidance,
-          num_inference_steps: 28,
-          output_format: 'png',
-          output_quality: 90,
-          prompt_strength: config.strength,
-          aspect_ratio: aspectRatio, // ✅ FIXED: Use string like "4:5" instead of "custom"
-          // ❌ REMOVED: width and height (not supported with aspect_ratio)
+          negative_prompt: 'blurry, low quality, distorted, ugly, watermark, text, jpeg artifacts, low resolution',
+          num_inference_steps: 35,
+          guidance_scale: config.guidance || 7.5,
+          // ✅ CRITICAL: High resolution LANDSCAPE (wider than tall)
+          width: dimensions.width,
+          height: dimensions.height,
+          // SDXL will automatically crop/fit the input image to this aspect ratio
         },
       }
     );
 
     if (Array.isArray(output) && output.length > 0) {
+      console.log('✅ High-resolution LANDSCAPE image generated successfully');
+      console.log(`   Size: ${dimensions.width}×${dimensions.height} pixels (landscape)`);
+      console.log(`   DPI: ~${Math.round(dimensions.width / parseInt(canvasSize?.split('x')[1] || '16'))} (for print)`);
       return output[0];
-    } else if (typeof output === 'string') {
-      return output;
     }
-
+    
     throw new Error('No image generated');
   } catch (error) {
-    console.error('Replicate generation error:', error);
+    console.error('❌ Replicate generation error:', error);
     throw new Error('Failed to generate image');
+  }
+}
+
+// Helper: Calculate actual DPI of generated image for LANDSCAPE
+export function calculateDPI(canvasSize: string): number {
+  const dimensions = CANVAS_DIMENSIONS[canvasSize as keyof typeof CANVAS_DIMENSIONS];
+  if (!dimensions) return 0;
+  
+  // Extract canvas dimensions (e.g., '12x16' → width=12, height=16)
+  const [w, h] = canvasSize.replace('canvas-', '').split('x').map(Number);
+  
+  // For landscape: width is the larger dimension
+  const canvasWidthInches = Math.max(w, h);
+  
+  // Calculate DPI: pixels / inches
+  return Math.round(dimensions.width / canvasWidthInches);
+}
+
+// Helper: Get print quality assessment
+export function getPrintQuality(canvasSize: string): {
+  dpi: number;
+  quality: 'excellent' | 'good' | 'acceptable' | 'poor';
+  message: string;
+} {
+  const dpi = calculateDPI(canvasSize);
+  
+  if (dpi >= 250) {
+    return {
+      dpi,
+      quality: 'excellent',
+      message: '✅ Professional print quality',
+    };
+  } else if (dpi >= 180) {
+    return {
+      dpi,
+      quality: 'good',
+      message: '✅ High quality print',
+    };
+  } else if (dpi >= 150) {
+    return {
+      dpi,
+      quality: 'acceptable',
+      message: '⚠️ Acceptable print quality',
+    };
+  } else {
+    return {
+      dpi,
+      quality: 'poor',
+      message: '❌ May appear pixelated when printed',
+    };
   }
 }
 
