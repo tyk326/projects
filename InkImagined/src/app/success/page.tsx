@@ -1,13 +1,14 @@
 'use client';
 
 // FRONTEND PAGE: Payment Success
+// FIXED: Wrapped in Suspense for useSearchParams
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function SuccessPage() {
+function SuccessPageContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const [order, setOrder] = useState<any>(null);
@@ -139,5 +140,18 @@ export default function SuccessPage() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+// ✅ Wrap in Suspense
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin" />
+      </div>
+    }>
+      <SuccessPageContent />
+    </Suspense>
   );
 }

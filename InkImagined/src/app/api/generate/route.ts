@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
 
     console.log('🎨 Generating image:', {
       theme,
-      canvasSize: canvasSize || 'default (4:5)',
+      canvasSize: canvasSize || 'default (5:4)',
       userId: user.id,
     });
 
