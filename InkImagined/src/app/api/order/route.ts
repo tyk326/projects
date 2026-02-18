@@ -76,7 +76,8 @@ export async function POST(request: NextRequest) {
       order.generated_images.generated_url,
       product.printful_variant_id,
       order.shipping_address as ShippingAddress,
-      order.amount
+      order.amount,
+      order.generated_images.id
     );
 
     // Confirm the order (this charges your Printful account and starts production)

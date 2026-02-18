@@ -14,7 +14,7 @@ export const CANVAS_PRODUCTS = [
     name: '12" × 9" Canvas',
     size: '12x9',
     price: 3899, // $38.99 in cents
-    printful_variant_id: '6994c79e6fc281', // Replace with actual Printful variant ID
+    printful_variant_id: 19295, // Replace with actual Printful variant ID
     aspectRatio: '4:3', // Landscape
     description: 'Perfect for desk or small wall spaces',
   },
@@ -23,7 +23,7 @@ export const CANVAS_PRODUCTS = [
     name: '16" × 12" Canvas',
     size: '16x12',
     price: 5099, // $50.99 in cents
-    printful_variant_id: '6994c79e6fc328', // Replace with actual Printful variant ID
+    printful_variant_id: 5, // Replace with actual Printful variant ID
     aspectRatio: '4:3', // Landscape
     description: 'Most popular - great for any room',
   },
@@ -32,7 +32,7 @@ export const CANVAS_PRODUCTS = [
     name: '20" × 16" Canvas',
     size: '20x16',
     price: 6799, // $67.99 in cents
-    printful_variant_id: '6994c79e6fc399', // Replace with actual Printful variant ID
+    printful_variant_id: 6, // Replace with actual Printful variant ID
     aspectRatio: '5:4', // Landscape
     description: 'Statement piece - impressive size',
   },
